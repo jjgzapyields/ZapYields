@@ -1,39 +1,48 @@
-# ZapYields Mainnet Alpha ⚡
+# ZapApy V2 Pro ⚡
 
 [![Network](https://img.shields.io/badge/Network-Base_Mainnet-blue)](https://base.org)
 [![Solidity](https://img.shields.io/badge/Solidity-%5E0.8.20-363636.svg)](https://soliditylang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-ZapYields is a decentralized yield aggregator built on the Base network. It simplifies access to institutional-grade DeFi by allowing users to deposit USDC into the $100M+ Moonwell Flagship MetaMorpho Vault with a single click, earning high-yield APY with zero price volatility.
+ZapApy V2 is a decentralized yield aggregator and profit-sharing system built on the Base network. It simplifies access to institutional-grade DeFi while providing automated financial incentives for users to grow the network.
 
 ---
 
 ## 📑 Table of Contents
-- [Features](#-features)
-- [System Architecture](#-system-architecture)
+- [V2 Features](#-v2-features)
+- [Profit Sharing & Penalty Logic](#-profit-sharing--penalty-logic)
 - [Smart Contract Details](#-smart-contract-details)
-- [Frontend Integration](#-frontend-integration)
+- [Frontend Capabilities](#-frontend-capabilities)
 - [Usage Guide](#-usage-guide)
 - [Security](#-security)
-- [Roadmap (V2)](#-roadmap-v2)
 
 ---
 
-## ✨ Features
+## ✨ V2 Features
 
-* **1-Click Yield:** Streamlined UX for depositing USDC into complex MetaMorpho vaults.
-* **Auto-Compounding:** Interest is automatically baked into the share value (ERC-4626 standard).
-* **Live Yield Ticker:** Optimistic frontend rendering shows micro-yield growth every 50ms.
-* **Decentralized Referral System:** Immutable on-chain tracking for user downlines.
-* **Low Gas Fees:** Fully optimized for the Base L2 network.
+* **1-Click Yield:** Streamlined UX for depositing USDC into the $100M+ Moonwell MetaMorpho Vault.
+* **Earn-Per-Second Metric:** Real-time visibility into the exact micro-yield earned every second.
+* **Automated Network Rewards:** Smart-contract enabled instant profit sharing for referrers.
+* **Self-Sustaining Protocol:** Treasury collects a micro-fee solely from generated yield, keeping user principal 100% untouched.
 
 ---
 
-## 🏗 System Architecture
+## 💸 Profit Sharing & Penalty Logic
 
-The protocol uses a dual-layer approach:
-1. **The Vault (Smart Contract):** Holds user state, accepts deposits, and interacts with the Moonwell standard interfaces.
-2. **The Aggregator (Morpho):** The external yield source that lends the USDC to over-collateralized borrowers.
+ZapApy utilizes a fair, automated incentive system designed to reward long-term stakers and network growth.
+
+### The 76-Hour Loyalty Lock
+To protect the vault from flash-farming, all deposits enter a 76-hour lock.
+* **Early Withdrawal:** Triggers a 1% penalty on the total value. No profit is distributed.
+* **Standard Withdrawal (Post-76 Hours):** 100% Free. No penalty.
+
+### The Profit Split (Standard Withdrawal)
+Upon a successful standard withdrawal, the Smart Contract calculates the **exact yield generated** and splits that profit:
+* **85%** returned to the User (Yield + 100% of Principal).
+* **10%** sent instantly to the user's Referrer.
+* **5%** sent to the ZapApy Protocol Treasury (Performance Fee).
+
+*Note: The Protocol and Referrers ONLY earn from generated profit. The user's principal is never taxed.*
 
 ---
 
@@ -48,41 +57,29 @@ The protocol uses a dual-layer approach:
 <details>
 <summary><code>zapIn(uint256 _amount, address _referrer)</code></summary>
 
-* Transfers user USDC to the contract.
-* Registers the `_referrer` (if new user).
-* Approves and deposits USDC into the Morpho Vault.
-* Credits the user with corresponding Morpho Shares.
-* *Min Deposit: 10 USDC*
+* Transfers USDC and registers the `_referrer` permanently on the blockchain.
+* Deposits USDC into the Morpho Vault, crediting user with Morpho Shares.
+* Triggers the 76-hour lock timer.
 </details>
 
 <details>
 <summary><code>zapOut()</code></summary>
 
-* Checks user share balance.
-* Redeems 100% of shares from Morpho back to USDC.
-* Transfers Principal + Profit back to the user.
-* Resets user ledger to `0`.
-</details>
-
-<details>
-<summary><code>getAccountValue(address _user)</code></summary>
-
-* A `view` function that interacts with Morpho's `convertToAssets` to calculate the live USD value of a user's shares.
+* Checks lock status. If early, applies 1% penalty and exits.
+* If post-76 hours, redeems 100% of shares back to USDC.
+* Calculates absolute profit.
+* Splits the profit between User, Referrer, and Protocol.
+* Refunds the Principal to User.
 </details>
 
 ---
 
-## 🖥 Frontend Integration
+## 🖥 Frontend Capabilities
 
-The DApp uses standard HTML/CSS/JS with **Ethers.js (v5.7.2)** for Web3 connectivity.
+The dashboard uses **Ethers.js (v5.7.2)** and introduces high-level mathematical displays.
 
-**Key UI Logic (The Optimistic Ticker):**
-Due to blockchain block times (2s), real-time yield is rendered optimistically using a JS interval:
+**Per-Second Engine:**
+Calculates the exact second-by-second growth using the active 9.1% APY:
 ```javascript
-// Calculates growth per millisecond based on 9.1% APY
-const growthPerMs = ((currentVal * 0.091) / 31536000) / 1000;
-
-setInterval(() => {
-  liveVal += (growthPerMs * 50);
-  document.getElementById('yieldDisplay').innerText = liveVal.toFixed(6); 
-}, 50);
+const growthPerSecond = ((currentVal * 0.091) / 31536000);
+document.getElementById('perSecondDisplay').innerText = growthPerSecond.toFixed(8);
