@@ -2,140 +2,101 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>ZapYield | Network Guard v1.2</title>
+  <title>ZapYield | Mainnet Live</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
-  <style>
-    .hidden { display: none !important; }
-    .status-error { color: #ff4444; background: rgba(255,0,0,0.1); padding: 5px; border-radius: 4px; }
-    .status-ok { color: #facc15; }
-    #networkWarning { background: #7f1d1d; color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 8px; margin-bottom: 20px; }
-  </style>
 </head>
 <body class="body-2">
-
-  <div id="networkWarning" class="hidden">⚠️ WRONG NETWORK: Please switch to Base Sepolia in MetaMask</div>
-
   <div class="zy-header">
     <div class="zy-inner">
-      <div class="zy-logo">ZapYields⚡</div>
+      <div class="zy-logo">ZapYields⚡ <span style="font-size: 10px; color: #facc15;">MAINNET</span></div>
       <div class="header-btns">
         <a href="#" id="connectBtn" class="zy-connect-wallet w-button">Connect Wallet</a>
-        <a href="#" id="disconnectBtn" class="w-button hidden" style="background: #450a0a;">Disconnect</a>
+        <a href="#" id="disconnectBtn" class="w-button" style="display:none; background:#450a0a;">Disconnect</a>
       </div>
     </div>
   </div>
 
   <div class="zy-main-container">
     <div class="zmp-inner">
-      <h1 class="zy-h1">Vault Dashboard</h1>
-      <div class="zy-2-cols">
-        <div class="zy-col1">
-          <div class="div-block-89">
-            <input type="number" id="amountInput" placeholder="Min 10 USDC" class="input-field" style="color:black;">
-            <div class="zy-btns">
-              <button id="approveBtn" class="button-3 w-button">1. Approve</button>
-              <button id="zapInBtn" class="zy-approve w-button">2. Zap In</button>
-            </div>
-            <p id="statusLabel" class="status-ok" style="margin-top:15px; text-align:center;">Checking Wallet...</p>
-          </div>
-        </div>
-        <div class="zy-col1">
-          <div class="ls-yb">
-            <div>Yield Balance: <strong id="yieldDisplay">$0.00</strong></div>
-          </div>
-        </div>
+      <div class="zy-col1">
+        <input type="number" id="amountInput" placeholder="Min 10 USDC" class="input-field" style="color:black;">
+        <button id="approveBtn" class="button-3 w-button">1. Approve</button>
+        <button id="zapInBtn" class="zy-approve w-button">2. Zap In</button>
+        <p id="statusLabel" style="color:#facc15; text-align:center; margin-top:10px;">Connect to Base Mainnet</p>
+      </div>
+      <div class="ls-yb">
+        <div>Live Vault Value: <strong id="yieldDisplay">$0.00</strong></div>
       </div>
     </div>
   </div>
 
   <script>
-    const VAULT_ADDR = "0x2392e90da0f0De5FD1Fa0978a244CcEE23b6CeF2";
-    const BASE_SEPOLIA_HEX = "0x14a34"; // 84532
-    
-    const V_ABI = ["function getAccountValue(address u) view returns (uint256)"];
-    
-    let signer, provider, vault;
+    const MAINNET_CHAIN_ID = 8453;
+    const MAINNET_CHAIN_HEX = "0x2105";
+    const VAULT_ADDR = "0x15f51f8106E9d647922495B6e1B1171fEFA8F50d";
+    const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+
+    const V_ABI = ["function zapIn(uint256 a, address r) external", "function getAccountValue(address u) view returns (uint256)"];
+    const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
+
+    let signer, provider, vault, usdc;
 
     window.onload = async () => {
       if (window.ethereum) {
         provider = new ethers.providers.Web3Provider(window.ethereum);
-        
-        // Auto-refresh on network change
         window.ethereum.on('chainChanged', () => window.location.reload());
-        window.ethereum.on('accountsChanged', () => window.location.reload());
-
+        
         const accounts = await provider.listAccounts();
-        if (accounts.length > 0 && localStorage.getItem('walletStatus') === 'connected') {
-          setupUI(accounts[0]);
-        } else {
-          updateStatus("Ready");
-        }
+        if (accounts.length > 0) setup(accounts[0]);
       }
-      
       document.getElementById('connectBtn').onclick = connect;
-      document.getElementById('disconnectBtn').onclick = disconnect;
     };
 
     async function connect() {
       try {
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        
-        // Force switch network
+        // Request Network Switch to Mainnet
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: BASE_SEPOLIA_HEX }],
+          params: [{ chainId: MAINNET_CHAIN_HEX }],
         });
-
-        localStorage.setItem('walletStatus', 'connected');
-        const accounts = await provider.listAccounts();
-        setupUI(accounts[0]);
+        const accounts = await provider.send("eth_requestAccounts", []);
+        setup(accounts[0]);
       } catch (err) {
+        if (err.code === 4902) alert("Please add Base Mainnet to MetaMask");
         console.error(err);
-        updateStatus("Connection Failed", true);
       }
     }
 
-    async function setupUI(addr) {
+    async function setup(addr) {
       const { chainId } = await provider.getNetwork();
-      
-      if (chainId !== 84532) {
-        document.getElementById('networkWarning').classList.remove('hidden');
-        updateStatus("Wrong Network", true);
-        return;
-      }
+      if (chainId !== MAINNET_CHAIN_ID) return updateStatus("Wrong Network - Switch to Base", true);
 
       signer = provider.getSigner();
       vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
-      
-      document.getElementById('connectBtn').classList.add('hidden');
-      document.getElementById('disconnectBtn').classList.remove('hidden');
-      updateStatus("Connected to Base Sepolia");
-      
-      fetchBalance(addr);
+      usdc = new ethers.Contract(USDC_ADDR, U_ABI, signer);
+
+      document.getElementById('connectBtn').innerText = addr.substring(0,6) + "...";
+      updateStatus("Connected to Mainnet");
+      refresh(addr);
     }
 
-    async function fetchBalance(addr) {
+    async function refresh(addr) {
       try {
         const bal = await vault.getAccountValue(addr);
         document.getElementById('yieldDisplay').innerText = "$" + ethers.utils.formatUnits(bal, 6);
-      } catch (err) {
-        console.error("The error happened here:", err);
-        updateStatus("Vault Read Error: Contract not found on this chain", true);
-      }
+      } catch (err) { console.error(err); }
     }
 
-    function disconnect() {
-      localStorage.setItem('walletStatus', 'disconnected');
-      window.location.reload();
+    async function handleApprove() {
+        const val = document.getElementById('amountInput').value;
+        const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(val, 6));
+        await tx.wait();
+        updateStatus("Approved!");
     }
 
-    function updateStatus(msg, isErr = false) {
-      const s = document.getElementById('statusLabel');
-      s.innerText = msg;
-      s.className = isErr ? "status-error" : "status-ok";
-    }
+    function updateStatus(msg) { document.getElementById('statusLabel').innerText = msg; }
   </script>
 </body>
 </html>
