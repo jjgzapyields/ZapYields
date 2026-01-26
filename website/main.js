@@ -14,16 +14,25 @@ let signer, provider, vault, usdc;
 let tickerInterval;
 
 window.onload = async () => {
-  // 1. Fetch the secret address from Vercel securely
+  // 1. Fetch address from Vercel API
   try {
     const response = await fetch('/api/config');
     const data = await response.json();
     VAULT_ADDR = data.vaultAddress;
+
+    // ✅ SAFETY LOCK: Stop everything if the address isn't valid
+    if (!VAULT_ADDR || VAULT_ADDR === "" || !ethers.utils.isAddress(VAULT_ADDR)) {
+      console.error("FATAL ERROR: Vault Address not found or invalid. Check Vercel Env Variables.");
+      updateStatus("System Error: Contract Not Found", true);
+      return; // Stops the rest of the script from crashing
+    }
+
   } catch (err) {
-    console.error("Failed to load secure config.");
+    console.error("Failed to fetch config from Vercel API", err);
+    return;
   }
 
-  // 2. Load the rest of the site
+  // 2. ONLY proceed if the address was successfully loaded
   document.getElementById('connectBtn').onclick = connectWallet;
   document.getElementById('disconnectBtn').onclick = disconnectWallet;
   document.getElementById('approveBtn').onclick = handleApprove;
@@ -36,6 +45,8 @@ window.onload = async () => {
     provider.listAccounts().then(accs => { if (accs.length > 0) setupSession(accs[0]); });
   }
 };
+
+// ... keep the rest of your main.js exactly the same ...
 
 
 async function connectWallet(e) {
