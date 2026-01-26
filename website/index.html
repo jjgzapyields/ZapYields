@@ -1,18 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-wf-page="6976bad4554906b552056036" data-wf-site="68e9a4589764b573e2afecc9" lang="en">
 <head>
   <meta charset="utf-8">
-  <title>ZapYield | Portfolio View</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <title>ZapYield | Professional Alpha</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/components.css" rel="stylesheet" type="text/css">
   <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript"></script>
+
+  <style>
+    /* Force SVG Visibility if CSS fails to load */
+    .ikonik-91jrm { display: inline-block !important; vertical-align: middle; }
+    .zy-connect-wallet { cursor: pointer; }
+    #statusLabel { font-weight: bold; transition: all 0.3s ease; }
+  </style>
 </head>
 <body class="body-2">
   <div class="zy-header">
     <div class="zy-inner">
-      <a href="#" class="zy-logo w-inline-block" style="display: flex; align-items: center; color: white; text-decoration: none;">
+      <a href="#" class="zy-logo w-inline-block">
         <div class="text-block-31">ZapYields</div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewbox="0 0 24 25" fill="none" class="ikonik-91jrm">
+          <path d="M8.50001 23.968C8.20001 23.968 7.90001 23.868 7.60001 23.768C6.80001 23.368 6.40001 22.568 6.60001 21.768L7.80001 15.968H6.00001C5.20001 15.968 4.50001 15.468 4.20001 14.768C3.90001 14.068 4.00001 13.268 4.60001 12.768L14.1 2.66801C14.7 2.06801 15.7 1.86801 16.4 2.26801C17.2 2.66801 17.6 3.46801 17.4 4.26801L16.2 10.068H18C18.8 10.068 19.5 10.568 19.8 11.268C20.1 11.968 20 12.768 19.4 13.268L9.90001 23.368C9.50001 23.768 9.00001 23.968 8.50001 23.968Z" fill="#facc15"></path>
+        </svg>
       </a>
       <a href="#" id="connectBtn" class="zy-connect-wallet w-button">Connect Wallet</a>
     </div>
@@ -21,37 +34,36 @@
   <div class="zy-main-container">
     <div class="zy-main-app">
       <div class="zmp-inner">
-        <h1 class="zy-h1">Portfolio Dashboard<br><span class="text-span" id="networkStatus">Base Sepolia</span></h1>
+        <h1 class="zy-h1">ZapYields Vault<br><span class="text-span" id="networkIndicator">Checking Connection...</span></h1>
         
         <div class="zy-2-cols">
           <div class="zy-col1">
-            <h2 class="heading-9">Vault Action</h2>
+            <h2 class="heading-9">Action Panel</h2>
             <div class="div-block-89">
-              <input placeholder="10" type="number" id="amountInput" class="input-field" style="color: black !important;">
+              <div class="amount">
+                <div class="amount-label">Amount (USDC)</div>
+                <input placeholder="Min 10" type="number" id="amountInput" class="input-field" style="color: black !important; padding: 12px; border-radius: 8px;">
+              </div>
               <div class="zy-btns">
                 <a href="#" id="approveBtn" class="button-3 w-button">1. Approve</a>
                 <a href="#" id="zapInBtn" class="zy-approve w-button">2. Zap In</a>
+                <a href="#" id="zapOutBtn" class="red-btn w-button" style="margin-top:10px; background-color: #450a0a;">ZAP OUT ALL</a>
               </div>
-              <p id="statusLabel" style="font-size: 11px; margin-top: 15px; color: #facc15; text-align: center;">Ready</p>
+              <p id="statusLabel" style="font-size: 12px; margin-top: 15px; color: #facc15; text-align: center;">Initialize System...</p>
             </div>
           </div>
 
           <div class="zy-col1">
-            <h2 class="heading-9">Wallet Balances</h2>
-            <div class="ls-yb" style="padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.05);">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span>ETH:</span> <span id="ethBal" class="text-yellow-500">0.000</span>
+            <h2 class="heading-9">Live Stats</h2>
+            <div class="ls-yb">
+              <div class="zy-yb-text">Yield Balance</div>
+              <div class="yb-amt-wrap">
+                <div class="zy-yb-cur">$</div>
+                <div class="zy-yb-amt" id="yieldDisplay">0.00</div>
               </div>
-              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span>USDC:</span> <span id="usdcBal" class="text-yellow-500">0.00</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span>USDT:</span> <span id="usdtBal" class="text-yellow-500">0.00</span>
-              </div>
-              <hr style="border: 0.5px solid #333; margin: 10px 0;">
-              <div style="display: flex; justify-content: space-between;">
-                <strong>Vault Yield:</strong> <strong id="yieldDisplay" style="color: #facc15;">$0.00</strong>
-              </div>
+            </div>
+            <div id="downlineList" style="font-size: 11px; margin-top: 20px; color: #94a3b8;">
+                Team members will appear after connection.
             </div>
           </div>
         </div>
@@ -60,61 +72,121 @@
   </div>
 
   <script>
-    const VAULT_ADDRESS = "0x2392e90da0f0De5FD1Fa0978a244CcEE23b6CeF2";
-    const USDC_ADDRESS = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
-    const USDT_ADDRESS = "0x56087d0046E315993888362629E2F1626A9C5d68"; // Common Base Sepolia USDT test address
+    // --- CONFIG ---
+    const VAULT_ADDR = "0x2392e90da0f0De5FD1Fa0978a244CcEE23b6CeF2";
+    const USDC_ADDR = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
+    const BASE_SEPOLIA_HEX = "0x14a34"; 
 
-    const ERC20_ABI = ["function balanceOf(address) view returns (uint256)"];
-    const VAULT_ABI = ["function getAccountValue(address) view returns (uint256)"];
+    const V_ABI = [
+      "function zapIn(uint256 a, address r) external",
+      "function zapOut() external",
+      "function getAccountValue(address u) view returns (uint256)",
+      "function getDownlines(address u) view returns (address[] memory)"
+    ];
+    const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
 
-    let signer, provider;
+    let signer, vault, usdc;
 
-    window.onload = () => {
-      document.getElementById('connectBtn').onclick = connectWallet;
-      document.getElementById('approveBtn').onclick = handleApprove;
-      document.getElementById('zapInBtn').onclick = handleZapIn;
+    // --- PRE-FLIGHT CHECK ---
+    window.onload = async () => {
+      const status = document.getElementById('statusLabel');
+      
+      if (typeof ethers === 'undefined') {
+        status.innerText = "CRITICAL ERROR: Ethers Library Not Loaded!";
+        status.style.color = "red";
+        return;
+      }
+      
+      status.innerText = "System Ready. Please Connect.";
+      
+      // Button Listeners
+      document.getElementById('connectBtn').onclick = connect;
+      document.getElementById('approveBtn').onclick = approve;
+      document.getElementById('zapInBtn').onclick = zapIn;
+      document.getElementById('zapOutBtn').onclick = zapOut;
     };
 
-    async function connectWallet(e) {
+    async function connect(e) {
       if(e) e.preventDefault();
-      if (!window.ethereum) return alert("Install MetaMask!");
-      
+      if (!window.ethereum) return alert("Please install MetaMask!");
+
       try {
-        provider = new ethers.providers.Web3Provider(window.ethereum);
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        
+        // Check Network
+        const { chainId } = await provider.getNetwork();
+        if (chainId !== 84532) {
+          try {
+            await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: BASE_SEPOLIA_HEX }],
+            });
+          } catch (err) { alert("Please switch to Base Sepolia Network"); return; }
+        }
+
         await provider.send("eth_requestAccounts", []);
         signer = provider.getSigner();
         const addr = await signer.getAddress();
         
+        vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
+        usdc = new ethers.Contract(USDC_ADDR, U_ABI, signer);
+
         document.getElementById('connectBtn').innerText = addr.substring(0,6) + "...";
-        refreshStats(addr);
-      } catch (err) { console.error(err); }
+        document.getElementById('networkIndicator').innerText = "Connected: Base Sepolia";
+        updateStatus("Connected Successfully!");
+        refresh(addr);
+      } catch (err) { updateStatus("Connection Error"); console.error(err); }
     }
 
-    async function refreshStats(addr) {
+    async function approve(e) {
+      if(e) e.preventDefault();
+      const val = document.getElementById('amountInput').value;
+      if (val < 10) return alert("Min investment is 10 USDC");
+      
       try {
-        // 1. Fetch ETH Balance (Native)
-        const ethRaw = await provider.getBalance(addr);
-        document.getElementById('ethBal').innerText = parseFloat(ethers.utils.formatEther(ethRaw)).toFixed(4);
-
-        // 2. Fetch USDC Balance (6 decimals)
-        const usdcContract = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, provider);
-        const usdcRaw = await usdcContract.balanceOf(addr);
-        document.getElementById('usdcBal').innerText = ethers.utils.formatUnits(usdcRaw, 6);
-
-        // 3. Fetch USDT Balance (6 decimals)
-        const usdtContract = new ethers.Contract(USDT_ADDRESS, ERC20_ABI, provider);
-        const usdtRaw = await usdtContract.balanceOf(addr);
-        document.getElementById('usdtBal').innerText = ethers.utils.formatUnits(usdtRaw, 6);
-
-        // 4. Fetch Vault Yield Balance
-        const vault = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, provider);
-        const yieldRaw = await vault.getAccountValue(addr);
-        document.getElementById('yieldDisplay').innerText = "$" + ethers.utils.formatUnits(yieldRaw, 6);
-
-      } catch (err) { console.error("Balance fetch error:", err); }
+        updateStatus("Requesting Approval...");
+        const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(val, 6));
+        await tx.wait();
+        updateStatus("Approved! You can now Zap In.");
+      } catch (err) { updateStatus("Approval Denied"); }
     }
 
-    // (handleApprove and handleZapIn remain same as previous versions)
+    async function zapIn(e) {
+      if(e) e.preventDefault();
+      const val = document.getElementById('amountInput').value;
+      try {
+        updateStatus("Processing Zap...");
+        const ref = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
+        const tx = await vault.zapIn(ethers.utils.parseUnits(val, 6), ref);
+        await tx.wait();
+        updateStatus("Zap Success!");
+        refresh(await signer.getAddress());
+      } catch (err) { updateStatus("Zap Failed"); }
+    }
+
+    async function zapOut(e) {
+      if(e) e.preventDefault();
+      try {
+        updateStatus("Withdrawing...");
+        const tx = await vault.zapOut();
+        await tx.wait();
+        updateStatus("Withdrawal Complete!");
+        refresh(await signer.getAddress());
+      } catch (err) { updateStatus("Withdraw Failed"); }
+    }
+
+    async function refresh(addr) {
+      const val = await vault.getAccountValue(addr);
+      document.getElementById('yieldDisplay').innerText = ethers.utils.formatUnits(val, 6);
+      
+      const team = await vault.getDownlines(addr);
+      if(team.length > 0) {
+        document.getElementById('downlineList').innerHTML = team.map(t => 
+          `<div style="padding:4px; border-bottom:1px solid #333;">${t.substring(0,20)}...</div>`
+        ).join('');
+      }
+    }
+
     function updateStatus(msg) { document.getElementById('statusLabel').innerText = msg; }
   </script>
 </body>
