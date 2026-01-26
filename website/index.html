@@ -16,6 +16,14 @@
     .profit-green { color: #10b981; font-weight: bold; }
     .per-second { color: #3b82f6; font-size: 11px; font-weight: bold; margin-top: 3px; }
     .lock-warning { font-size: 11px; color: #facc15; margin-top: 5px; font-style: italic; }
+    
+    /* NEW: Disabled Button Style */
+    .disabled-btn { 
+      opacity: 0.3 !important; 
+      pointer-events: none !important; 
+      cursor: not-allowed !important; 
+      background: #52525b !important;
+    }
   </style>
 </head>
 <body class="body-2">
@@ -39,8 +47,8 @@
             <input placeholder="Min 10.00 USDC" type="number" id="amountInput" class="input-field" style="color: white !important;">
             <div class="zy-btns">
               <a href="#" id="approveBtn" class="button-3 w-button">1. Approve</a>
-              <a href="#" id="zapInBtn" class="zy-approve w-button">2. Zap In</a>
-              <a href="#" id="zapOutBtn" class="red-btn w-button" style="margin-top:10px; background: #6b1010;">Zap Out & Claim Profit</a>
+              <a href="#" id="zapInBtn" class="zy-approve w-button disabled-btn">2. Zap In</a>
+              <a href="#" id="zapOutBtn" class="red-btn w-button disabled-btn" style="margin-top:10px; background: #6b1010;">Zap Out & Claim Profit</a>
             </div>
             <p id="statusLabel" class="status-msg">Click Connect Wallet</p>
             <p class="lock-warning">Note: 76-Hour Lock applies to new deposits. 1% Early-Exit Penalty.</p>
@@ -74,6 +82,7 @@
       </div>
     </div>
   </div>
- <script type="module" src="/js/main.js"></script>
+
+  <script type="module" src="/main.js"></script>
 </body>
 </html>

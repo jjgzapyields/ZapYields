@@ -1,140 +1,154 @@
-    const VAULT_ADDR = "0x9501CB9649c5A7529a5d6DEDbE3Bce07d0DEec95"; 
-    const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+import { ethers } from "ethers";
 
-    // ✅ FIXED V2 ABI: Accounts for the 5 variables (including lastDepositTime)
-    const V_ABI = [
-      "function zapIn(uint256 a, address r) external",
-      "function zapOut() external",
-      "function getAccountValue(address u) view returns (uint256)",
-      "function getReferralEarnings(address u) view returns (uint256)",
-      "function users(address) view returns (uint256, uint256, address, uint256, uint256)" 
-    ];
-    const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
+// --- CONFIGURATION ---
+// In Vite, you can use import.meta.env to read from your .env file
+const VAULT_ADDR = "0x9501CB9649c5A7529a5d6DEDbE3Bce07d0DEec95"; // Or import.meta.env.VITE_VAULT_ADDR
+const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
-    let signer, provider, vault, usdc;
-    let tickerInterval;
+const V_ABI = [
+  "function zapIn(uint256 a, address r) external",
+  "function zapOut() external",
+  "function getAccountValue(address u) view returns (uint256)",
+  "function getReferralEarnings(address u) view returns (uint256)",
+  "function users(address) view returns (uint256, uint256, address, uint256, uint256)" 
+];
+const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
 
-    window.onload = () => {
-      document.getElementById('connectBtn').onclick = connectWallet;
-      document.getElementById('disconnectBtn').onclick = disconnectWallet;
-      document.getElementById('approveBtn').onclick = handleApprove;
-      document.getElementById('zapInBtn').onclick = handleZapIn;
-      document.getElementById('zapOutBtn').onclick = handleZapOut;
-      document.getElementById('copyRefBtn').onclick = copyReferral;
+let signer, provider, vault, usdc;
+let tickerInterval;
 
-      if (window.ethereum && localStorage.getItem('isWalletConnected') === 'true') {
-        provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-        provider.listAccounts().then(accs => { if (accs.length > 0) setupSession(accs[0]); });
-      }
-    };
+window.onload = () => {
+  document.getElementById('connectBtn').onclick = connectWallet;
+  document.getElementById('disconnectBtn').onclick = disconnectWallet;
+  document.getElementById('approveBtn').onclick = handleApprove;
+  document.getElementById('zapInBtn').onclick = handleZapIn;
+  document.getElementById('zapOutBtn').onclick = handleZapOut;
+  document.getElementById('copyRefBtn').onclick = copyReferral;
 
-    async function connectWallet(e) {
-      if(e) e.preventDefault();
-      try {
-        await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: "0x2105" }] });
-        const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        localStorage.setItem('isWalletConnected', 'true');
-        setupSession(accs[0]);
-      } catch (err) { updateStatus("Failed to connect.", true); }
+  if (window.ethereum && localStorage.getItem('isWalletConnected') === 'true') {
+    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    provider.listAccounts().then(accs => { if (accs.length > 0) setupSession(accs[0]); });
+  }
+};
+
+async function connectWallet(e) {
+  if(e) e.preventDefault();
+  try {
+    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: "0x2105" }] });
+    const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    localStorage.setItem('isWalletConnected', 'true');
+    setupSession(accs[0]);
+  } catch (err) { updateStatus("Failed to connect.", true); }
+}
+
+async function setupSession(addr) {
+  provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+  signer = provider.getSigner();
+  vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
+  usdc = new ethers.Contract(USDC_ADDR, U_ABI, signer);
+
+  document.getElementById('connectBtn').classList.add('hidden');
+  document.getElementById('disconnectBtn').classList.remove('hidden');
+  updateStatus("System Ready", false);
+  refreshStats(addr);
+}
+
+// ✅ NEW: Manages Button States based on user balance
+async function refreshStats(addr) {
+  try {
+    const bal = await vault.getAccountValue(addr);
+    const refEarns = await vault.getReferralEarnings(addr);
+    const userData = await vault.users(addr);
+
+    const principal = parseFloat(ethers.utils.formatUnits(userData[0], 6));
+    const currentVal = parseFloat(ethers.utils.formatUnits(bal, 6));
+    const profit = currentVal > principal ? currentVal - principal : 0;
+
+    document.getElementById('principalDisplay').innerText = principal.toFixed(2);
+    document.getElementById('profitDisplay').innerText = profit.toFixed(4);
+    document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(refEarns, 6)).toFixed(4);
+
+    // --- BUTTON UNLOCK LOGIC ---
+    // If the user has a balance inside the contract, UNLOCK "Zap Out"
+    if (principal > 0) {
+      document.getElementById('zapOutBtn').classList.remove('disabled-btn');
+    } else {
+      document.getElementById('zapOutBtn').classList.add('disabled-btn');
     }
 
-    async function setupSession(addr) {
-      provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-      signer = provider.getSigner();
-      vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
-      usdc = new ethers.Contract(USDC_ADDR, U_ABI, signer);
+    const growthPerSecond = ((currentVal * 0.091) / 31536000);
+    document.getElementById('perSecondDisplay').innerText = growthPerSecond.toFixed(8);
 
-      document.getElementById('connectBtn').classList.add('hidden');
-      document.getElementById('disconnectBtn').classList.remove('hidden');
-      updateStatus("System Ready", false);
-      refreshStats(addr);
-    }
+    const growthPerMs = growthPerSecond / 1000;
+    let liveVal = currentVal;
+    clearInterval(tickerInterval);
+    tickerInterval = setInterval(() => {
+      liveVal += (growthPerMs * 50);
+      document.getElementById('yieldDisplay').innerText = liveVal.toFixed(6); 
+    }, 50);
 
-    async function refreshStats(addr) {
-      try {
-        const bal = await vault.getAccountValue(addr);
-        const refEarns = await vault.getReferralEarnings(addr);
-        const userData = await vault.users(addr);
+  } catch (err) {
+    console.error("Dashboard Error:", err);
+    document.getElementById('yieldDisplay').innerText = "0.000000";
+  }
+}
 
-        const principal = parseFloat(ethers.utils.formatUnits(userData[0], 6));
-        const currentVal = parseFloat(ethers.utils.formatUnits(bal, 6));
-        const profit = currentVal > principal ? currentVal - principal : 0;
-
-        document.getElementById('principalDisplay').innerText = principal.toFixed(2);
-        document.getElementById('profitDisplay').innerText = profit.toFixed(4);
-        document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(refEarns, 6)).toFixed(4);
-
-        // Per-Second Calculation (9.1% APY)
-        const growthPerSecond = ((currentVal * 0.091) / 31536000);
-        document.getElementById('perSecondDisplay').innerText = growthPerSecond.toFixed(8);
-
-        // Live Ticker (50ms interval)
-        const growthPerMs = growthPerSecond / 1000;
-        let liveVal = currentVal;
-        clearInterval(tickerInterval);
-        tickerInterval = setInterval(() => {
-          liveVal += (growthPerMs * 50);
-          document.getElementById('yieldDisplay').innerText = liveVal.toFixed(6); 
-        }, 50);
-
-      } catch (err) {
-        console.error("Dashboard Error:", err);
-        document.getElementById('yieldDisplay').innerText = "0.000000";
-      }
-    }
-
-    async function handleApprove(e) {
-      if(e) e.preventDefault();
-      const val = document.getElementById('amountInput').value;
-      if (!val || val < 10) return updateStatus("Min 10 USDC", true);
-      try {
-        updateStatus("Approving...", false);
-        const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(val, 6));
-        await tx.wait();
-        updateStatus("Approved! Ready to Zap In.", false);
-      } catch (err) { updateStatus("Approval Failed", true); }
-    }
-
-    async function handleZapIn(e) {
-      if(e) e.preventDefault();
-      const val = document.getElementById('amountInput').value;
-      const ref = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
-      try {
-        updateStatus("Zapping In...", false);
-        const tx = await vault.zapIn(ethers.utils.parseUnits(val, 6), ref, { gasLimit: 400000 });
-        await tx.wait();
-        updateStatus("Zap Successful! 76-Hour Lock Started.", false);
-        refreshStats(await signer.getAddress());
-      } catch (err) { updateStatus("Zap Failed", true); }
-    }
-
-    async function handleZapOut(e) {
-      if(e) e.preventDefault();
-      try {
-        updateStatus("Withdrawing...", false);
-        const tx = await vault.zapOut({ gasLimit: 600000 });
-        await tx.wait();
-        updateStatus("Withdrawn Successfully!", false);
-        refreshStats(await signer.getAddress());
-      } catch (err) { updateStatus("Withdrawal Failed", true); }
-    }
-
-    async function copyReferral(e) {
-      if(e) e.preventDefault();
-      const addr = await signer.getAddress();
-      const link = window.location.origin + window.location.pathname + "?ref=" + addr;
-      navigator.clipboard.writeText(link);
-      alert("Referral Link Copied! You earn 10% of their profit.");
-    }
-
-    function disconnectWallet(e) {
-      if(e) e.preventDefault();
-      localStorage.setItem('isWalletConnected', 'false');
-      window.location.reload();
-    }
+async function handleApprove(e) {
+  if(e) e.preventDefault();
+  const val = document.getElementById('amountInput').value;
+  if (!val || val < 10) return updateStatus("Min 10 USDC", true);
+  try {
+    updateStatus("Approving...", false);
+    const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(val, 6));
+    await tx.wait(); // Wait for blockchain confirmation
+    updateStatus("Approved! Ready to Zap In.", false);
     
-    function updateStatus(msg, isErr) {
-      const s = document.getElementById('statusLabel');
-      s.innerText = msg;
-      s.className = isErr ? "status-msg status-error" : "status-msg";
-    }
+    // ✅ NEW: Unlock "Zap In" after successful approval
+    document.getElementById('zapInBtn').classList.remove('disabled-btn'); 
+
+  } catch (err) { updateStatus("Approval Failed", true); }
+}
+
+async function handleZapIn(e) {
+  if(e) e.preventDefault();
+  const val = document.getElementById('amountInput').value;
+  const ref = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
+  try {
+    updateStatus("Zapping In...", false);
+    const tx = await vault.zapIn(ethers.utils.parseUnits(val, 6), ref, { gasLimit: 400000 });
+    await tx.wait();
+    updateStatus("Zap Successful! 76-Hour Lock Started.", false);
+    refreshStats(await signer.getAddress());
+  } catch (err) { updateStatus("Zap Failed", true); }
+}
+
+async function handleZapOut(e) {
+  if(e) e.preventDefault();
+  try {
+    updateStatus("Withdrawing...", false);
+    const tx = await vault.zapOut({ gasLimit: 600000 });
+    await tx.wait();
+    updateStatus("Withdrawn Successfully!", false);
+    refreshStats(await signer.getAddress());
+  } catch (err) { updateStatus("Withdrawal Failed", true); }
+}
+
+async function copyReferral(e) {
+  if(e) e.preventDefault();
+  const addr = await signer.getAddress();
+  const link = window.location.origin + window.location.pathname + "?ref=" + addr;
+  navigator.clipboard.writeText(link);
+  alert("Referral Link Copied! You earn 10% of their profit.");
+}
+
+function disconnectWallet(e) {
+  if(e) e.preventDefault();
+  localStorage.setItem('isWalletConnected', 'false');
+  window.location.reload();
+}
+
+function updateStatus(msg, isErr) {
+  const s = document.getElementById('statusLabel');
+  s.innerText = msg;
+  s.className = isErr ? "status-msg status-error" : "status-msg";
+}
