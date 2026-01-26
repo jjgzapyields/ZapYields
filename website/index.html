@@ -2,7 +2,7 @@
 <html data-wf-page="6976bad4554906b552056036" data-wf-site="68e9a4589764b573e2afecc9" lang="en">
 <head>
   <meta charset="utf-8">
-  <title>ZapYields | Production</title>
+  <title>ZapYields | Live Production</title>
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/components.css" rel="stylesheet" type="text/css">
@@ -10,7 +10,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
   <style>
     .hidden { display: none !important; }
-    .status-msg { font-size: 11px; margin-top: 12px; text-align: center; color: #facc15; font-weight: bold; }
+    .status-msg { font-size: 11px; margin-top: 15px; text-align: center; color: #facc15; font-weight: bold; }
+    .error-msg { color: #ff6b6b !important; }
+    .wallet-stat { font-size: 10px; opacity: 0.6; margin-top: 4px; }
   </style>
 </head>
 <body class="body-2">
@@ -26,18 +28,22 @@
 
   <div class="zy-main-container">
     <div class="zmp-inner">
-      <h1 class="zy-h1">Vault Dashboard</h1>
+      <h1 class="zy-h1">Mainnet Alpha</h1>
       <div class="zy-2-cols">
         <div class="zy-col1">
           <h2 class="heading-9">Investment</h2>
           <div class="div-block-89">
-            <input placeholder="USDC Amount (Min 10)" type="number" id="amountInput" class="input-field" style="color: white !important;">
-            <div class="zy-btns">
+            <input placeholder="Min 10.00 USDC" type="number" id="amountInput" class="input-field" style="color: white !important;">
+            <div id="walletBalances">
+              <div class="wallet-stat">USDC Balance: <span id="usdcBal">0.00</span></div>
+              <div class="wallet-stat">ETH Gas: <span id="ethBal">0.000</span></div>
+            </div>
+            <div class="zy-btns" style="margin-top: 15px;">
               <a href="#" id="approveBtn" class="button-3 w-button">1. Approve</a>
               <a href="#" id="zapInBtn" class="zy-approve w-button">2. Zap In</a>
               <a href="#" id="zapOutBtn" class="red-btn w-button" style="margin-top:10px; background: #6b1010;">Zap Out All</a>
             </div>
-            <p id="statusLabel" class="status-msg">Welcome to Base Mainnet</p>
+            <p id="statusLabel" class="status-msg">System Active</p>
           </div>
         </div>
 
@@ -54,9 +60,9 @@
           <div class="ls-yb" style="margin-top: 25px; border-top: 1px solid #333; padding-top: 20px;">
             <div class="zy-yb-text">Referral System</div>
             <div class="yb-amt-wrap">
-              <a href="#" id="copyRefBtn" class="ref-btn w-button">Copy My Link</a>
+              <a href="#" id="copyRefBtn" class="ref-btn w-button">Copy Link</a>
             </div>
-            <div id="downlineCount" style="font-size: 11px; opacity: 0.5; margin-top: 8px;">0 Referrals detected</div>
+            <div id="downlineCount" style="font-size: 11px; opacity: 0.5; margin-top: 10px;">Connect to see stats</div>
           </div>
         </div>
       </div>
@@ -64,9 +70,9 @@
   </div>
 
   <script>
-    const VAULT_ADDR = "0xa81f4e89804f3592bcaac44af53639e960aecc7f"; 
+    const MAINNET_HEX = "0x2105"; 
+    const VAULT_ADDR = "0xA81F4E89804f3592bcaAC44Af53639e960aeCC7f"; 
     const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
-    const MAINNET_HEX = "0x2105";
 
     const V_ABI = [
       "function zapIn(uint256 a, address r) external",
@@ -74,13 +80,16 @@
       "function getAccountValue(address u) view returns (uint256)",
       "function getDownlines(address u) view returns (address[] memory)"
     ];
-    const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
+    const U_ABI = [
+      "function approve(address s, uint256 a) public returns (bool)",
+      "function balanceOf(address a) view returns (uint256)"
+    ];
 
     let signer, provider, vault, usdc;
 
     window.onload = async () => {
       if (window.ethereum) {
-        provider = new ethers.providers.Web3Provider(window.ethereum);
+        provider = new ethers.providers.Web3Provider(window.ethereum, "any");
         window.ethereum.on('chainChanged', () => window.location.reload());
         const accounts = await provider.listAccounts();
         if (accounts.length > 0 && localStorage.getItem('active') === 'true') init(accounts[0]);
@@ -106,40 +115,60 @@
       signer = provider.getSigner();
       vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
       usdc = new ethers.Contract(USDC_ADDR, U_ABI, signer);
+      
       document.getElementById('connectBtn').classList.add('hidden');
       document.getElementById('disconnectBtn').classList.remove('hidden');
       refresh(addr);
-    }
-
-    async function doApprove() {
-      const v = document.getElementById('amountInput').value;
-      if (v < 10) return alert("Min 10 USDC");
-      const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(v, 6));
-      await tx.wait();
-      document.getElementById('statusLabel').innerText = "Approved!";
-    }
-
-    async function doZapIn() {
-      const v = document.getElementById('amountInput').value;
-      const r = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
-      const tx = await vault.zapIn(ethers.utils.parseUnits(v, 6), r);
-      await tx.wait();
-      refresh(await signer.getAddress());
-    }
-
-    async function doZapOut() {
-      const tx = await vault.zapOut();
-      await tx.wait();
-      refresh(await signer.getAddress());
     }
 
     async function refresh(addr) {
       try {
         const bal = await vault.getAccountValue(addr);
         document.getElementById('yieldDisplay').innerText = ethers.utils.formatUnits(bal, 6);
+        
+        const ethRaw = await provider.getBalance(addr);
+        document.getElementById('ethBal').innerText = parseFloat(ethers.utils.formatEther(ethRaw)).toFixed(3);
+        
+        const usdcRaw = await usdc.balanceOf(addr);
+        document.getElementById('usdcBal').innerText = ethers.utils.formatUnits(usdcRaw, 6);
+        
         const team = await vault.getDownlines(addr);
         document.getElementById('downlineCount').innerText = team.length + " Referrals active";
-      } catch (e) { console.error(e); }
+      } catch (e) { console.error("Refresh Error:", e); }
+    }
+
+    async function doApprove() {
+      const v = document.getElementById('amountInput').value;
+      if (v < 10) return updateStatus("Min 10 USDC", true);
+      try {
+        updateStatus("Confirming Approval...", false);
+        const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(v, 6));
+        await tx.wait();
+        updateStatus("Approved!", false);
+      } catch (e) { updateStatus("Approval Denied", true); }
+    }
+
+    async function doZapIn() {
+      const v = document.getElementById('amountInput').value;
+      const r = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
+      try {
+        updateStatus("Confirming Zap...", false);
+        // MANUAL GAS LIMIT to fix UNPREDICTABLE_GAS_LIMIT
+        const tx = await vault.zapIn(ethers.utils.parseUnits(v, 6), r, { gasLimit: 350000 });
+        await tx.wait();
+        updateStatus("Success!", false);
+        refresh(await signer.getAddress());
+      } catch (e) { updateStatus("Transaction Failed", true); }
+    }
+
+    async function doZapOut() {
+      try {
+        updateStatus("Withdrawing...", false);
+        const tx = await vault.zapOut({ gasLimit: 300000 });
+        await tx.wait();
+        updateStatus("Success!", false);
+        refresh(await signer.getAddress());
+      } catch (e) { updateStatus("Withdraw Failed", true); }
     }
 
     function doCopy() {
@@ -151,6 +180,11 @@
     }
 
     function disconnect() { localStorage.setItem('active', 'false'); window.location.reload(); }
+    function updateStatus(m, err) { 
+      const s = document.getElementById('statusLabel');
+      s.innerText = m;
+      s.className = err ? "status-msg error-msg" : "status-msg";
+    }
   </script>
 </body>
 </html>
