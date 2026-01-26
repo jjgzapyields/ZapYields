@@ -13,14 +13,14 @@ interface IMToken {
     function exchangeRateStored() external view returns (uint);
 }
 
-contract ZapYieldsMainnet is Ownable, ReentrancyGuard {
+contract ZapYieldsMainnetLive is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    // OFFICIAL BASE MAINNET ADDRESSES
+    // CORRECT CHECKSUMMED MAINNET ADDRESSES
     IERC20 public constant USDC = IERC20(0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913); 
-    IMToken public constant mUSDC = IMToken(0x1686616428c04907aB37a8987b7a97260714E290); 
+    IMToken public constant mUSDC = IMToken(0x1686616428c04907aB37A8987B7a97260714E290); 
 
-    uint256 public constant MIN_INVESTMENT = 10 * 1e6; // $10 USDC
+    uint256 public constant MIN_INVESTMENT = 10 * 1e6; 
 
     struct UserInfo {
         uint256 principal;
@@ -57,11 +57,11 @@ contract ZapYieldsMainnet is Ownable, ReentrancyGuard {
         UserInfo storage user = users[msg.sender];
         require(user.shareBalance > 0, "No balance");
 
-        uint256 amountToRedeem = user.shareBalance;
+        uint256 shares = user.shareBalance;
         user.shareBalance = 0;
         user.principal = 0;
 
-        require(mUSDC.redeem(amountToRedeem) == 0, "Morpho Redeem failed");
+        require(mUSDC.redeem(shares) == 0, "Morpho Redeem failed");
         uint256 balance = USDC.balanceOf(address(this));
         USDC.safeTransfer(msg.sender, balance);
     }
