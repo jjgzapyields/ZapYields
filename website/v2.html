@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ZapYields V2 | Pro Aggregator</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link href="css/normalize.css" rel="stylesheet" type="text/css">
+  <link href="css/components.css" rel="stylesheet" type="text/css">
+  <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+  <style>
+    .hidden { display: none !important; }
+    .status-msg { font-size: 11px; margin-top: 15px; text-align: center; color: #10b981; font-weight: bold; }
+    .status-error { color: #ff6b6b !important; }
+    .pro-stat { font-size: 12px; color: #a1a1aa; margin-top: 5px; }
+    .profit-green { color: #10b981; font-weight: bold; }
+  </style>
+</head>
+<body class="body-2">
+  <div class="zy-header">
+    <div class="zy-inner">
+      <div class="zy-logo">ZapYields⚡ <span style="font-size: 10px; color: #10b981;">V2 PRODUCTION</span></div>
+      <div class="header-btns">
+        <a href="#" id="connectBtn" class="zy-connect-wallet w-button">Connect Wallet</a>
+        <a href="#" id="disconnectBtn" class="w-button hidden" style="background: #450a0a; margin-left: 10px;">Disconnect</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="zy-main-container">
+    <div class="zmp-inner">
+      <h1 class="zy-h1">V2 Yield Aggregator</h1>
+      <div class="zy-2-cols">
+        <div class="zy-col1">
+          <h2 class="heading-9">Investment</h2>
+          <div class="div-block-89">
+            <input placeholder="Min 10.00 USDC" type="number" id="amountInput" class="input-field" style="color: white !important;">
+            <div class="zy-btns">
+              <a href="#" id="approveBtn" class="button-3 w-button">1. Approve</a>
+              <a href="#" id="zapInBtn" class="zy-approve w-button">2. Zap In</a>
+              <a href="#" id="zapOutBtn" class="red-btn w-button" style="margin-top:10px; background: #6b1010;">Zap Out & Claim Profit</a>
+            </div>
+            <p id="statusLabel" class="status-msg">Click Connect Wallet</p>
+          </div>
+        </div>
+
+        <div class="zy-col1">
+          <h2 class="heading-9">Live Portfolio</h2>
+          <div class="ls-yb">
+            <div class="zy-yb-text">Total Value (Auto-Compounding)</div>
+            <div class="yb-amt-wrap">
+              <div class="zy-yb-cur">$</div>
+              <div class="zy-yb-amt" id="yieldDisplay">0.00</div>
+            </div>
+            <div class="pro-stat">Principal: $<span id="principalDisplay">0.00</span></div>
+            <div class="pro-stat">Net Profit: <span class="profit-green">+$<span id="profitDisplay">0.00</span></span></div>
+          </div>
+          
+          <div class="ls-yb" style="margin-top: 25px; border-top: 1px solid #333; padding-top: 20px;">
+            <div class="zy-yb-text">Referral Earnings (10% of Downline Yield)</div>
+            <div class="yb-amt-wrap">
+              <div class="zy-yb-cur" style="color:#facc15;">$</div>
+              <div class="zy-yb-amt" id="refEarningsDisplay" style="color:#facc15;">0.00</div>
+            </div>
+            <div style="margin-top: 10px;">
+              <a href="#" id="copyRefBtn" class="ref-btn w-button">Copy My Pay Link</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 🚨 UPDATE WITH YOUR V2 CONTRACT ADDRESS 🚨 ---
+    const VAULT_ADDR = "PASTE_V2_ADDRESS_HERE"; 
+    const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+
+    const V_ABI = [
+      "function zapIn(uint256 a, address r) external",
+      "function zapOut() external",
+      "function getAccountValue(address u) view returns (uint256)",
+      "function getReferralEarnings(address u) view returns (uint256)",
+      "function users(address u) view returns (uint256 principal, uint256 shareBalance, address referrer, uint256 totalReferralEarnings)"
+    ];
+    const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
+
+    let signer, provider, vault, usdc;
+    let tickerInterval;
+
+    window.onload = () => {
+      document.getElementById('connectBtn').onclick = connectWallet;
+      document.getElementById('disconnectBtn').onclick = disconnectWallet;
+      document.getElementById('approveBtn').onclick = handleApprove;
+      document.getElementById('zapInBtn').onclick = handleZapIn;
+      document.getElementById('zapOutBtn').onclick = handleZapOut;
+      document.getElementById('copyRefBtn').onclick = copyReferral;
+
+      if (window.ethereum && localStorage.getItem('isWalletConnected') === 'true') {
+        provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+        provider.listAccounts().then(accs => { if (accs.length > 0) setupSession(accs[0]); });
+      }
+    };
+
+    async function connectWallet(e) {
+      if(e) e.preventDefault();
+      try {
+        await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: "0x2105" }] });
+        const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        localStorage.setItem('isWalletConnected', 'true');
+        setupSession(accs[0]);
+      } catch (err) { updateStatus("Failed to connect.", true); }
+    }
+
+    async function setupSession(addr) {
+      provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+      signer = provider.getSigner();
+      vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
+      usdc = new ethers.Contract(USDC_ADDR, U_ABI, signer);
+
+      document.getElementById('connectBtn').classList.add('hidden');
+      document.getElementById('disconnectBtn').classList.remove('hidden');
+      updateStatus("System Ready", false);
+      refreshStats(addr);
+    }
+
+    async function refreshStats(addr) {
+      try {
+        const bal = await vault.getAccountValue(addr);
+        const userData = await vault.users(addr);
+        const refEarns = await vault.getReferralEarnings(addr);
+
+        const currentVal = parseFloat(ethers.utils.formatUnits(bal, 6));
+        const principal = parseFloat(ethers.utils.formatUnits(userData.principal, 6));
+        const profit = currentVal > principal ? currentVal - principal : 0;
+
+        document.getElementById('principalDisplay').innerText = principal.toFixed(2);
+        document.getElementById('profitDisplay').innerText = profit.toFixed(4);
+        document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(refEarns, 6)).toFixed(4);
+
+        // Live Ticker for Total Value
+        let liveVal = currentVal;
+        const growthPerMs = ((liveVal * 0.091) / 31536000) / 1000;
+        clearInterval(tickerInterval);
+        tickerInterval = setInterval(() => {
+          liveVal += (growthPerMs * 50);
+          document.getElementById('yieldDisplay').innerText = liveVal.toFixed(6); 
+        }, 50);
+
+      } catch (err) {
+        document.getElementById('yieldDisplay').innerText = "0.000000";
+      }
+    }
+
+    async function handleApprove(e) {
+      if(e) e.preventDefault();
+      const val = document.getElementById('amountInput').value;
+      if (!val || val < 10) return updateStatus("Min 10 USDC", true);
+      try {
+        updateStatus("Approving...", false);
+        const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(val, 6));
+        await tx.wait();
+        updateStatus("Approved! Ready to Zap In.", false);
+      } catch (err) { updateStatus("Approval Failed", true); }
+    }
+
+    async function handleZapIn(e) {
+      if(e) e.preventDefault();
+      const val = document.getElementById('amountInput').value;
+      const ref = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
+      try {
+        updateStatus("Zapping In...", false);
+        const tx = await vault.zapIn(ethers.utils.parseUnits(val, 6), ref, { gasLimit: 400000 });
+        await tx.wait();
+        updateStatus("Zap Successful!", false);
+        refreshStats(await signer.getAddress());
+      } catch (err) { updateStatus("Zap Failed", true); }
+    }
+
+    async function handleZapOut(e) {
+      if(e) e.preventDefault();
+      try {
+        updateStatus("Withdrawing & Paying Referrals...", false);
+        const tx = await vault.zapOut({ gasLimit: 600000 });
+        await tx.wait();
+        updateStatus("Profit Claimed!", false);
+        refreshStats(await signer.getAddress());
+      } catch (err) { updateStatus("Withdrawal Failed", true); }
+    }
+
+    async function copyReferral(e) {
+      if(e) e.preventDefault();
+      const addr = await signer.getAddress();
+      const link = window.location.origin + window.location.pathname + "?ref=" + addr;
+      navigator.clipboard.writeText(link);
+      alert("Referral Link Copied! You earn 10% of their profit.");
+    }
+
+    function disconnectWallet(e) {
+      if(e) e.preventDefault();
+      localStorage.setItem('isWalletConnected', 'false');
+      window.location.reload();
+    }
+    
+    function updateStatus(msg, isErr) {
+      const s = document.getElementById('statusLabel');
+      s.innerText = msg;
+      s.className = isErr ? "status-msg status-error" : "status-msg";
+    }
+  </script>
+</body>
+</html>
