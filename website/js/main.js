@@ -1,14 +1,13 @@
-    // --- 🚨 PASTE THE BRAND NEW V2 ADDRESS HERE 🚨 ---
-    const VAULT_ADDR = "0x5a9020e0cd6c65e1f5a0acec3eaf9a0b5bbd6b6d"; 
+    const VAULT_ADDR = "0x9501CB9649c5A7529a5d6DEDbE3Bce07d0DEec95"; 
     const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
-    // ✅ FIXED V2 ABI: Perfectly matches the 4-part User info + Referral feature
+    // ✅ FIXED V2 ABI: Accounts for the 5 variables (including lastDepositTime)
     const V_ABI = [
       "function zapIn(uint256 a, address r) external",
       "function zapOut() external",
       "function getAccountValue(address u) view returns (uint256)",
       "function getReferralEarnings(address u) view returns (uint256)",
-      "function users(address) view returns (uint256, uint256, address, uint256)" 
+      "function users(address) view returns (uint256, uint256, address, uint256, uint256)" 
     ];
     const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
 
@@ -65,7 +64,7 @@
         document.getElementById('profitDisplay').innerText = profit.toFixed(4);
         document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(refEarns, 6)).toFixed(4);
 
-        // Calculate "Per Second" Growth (Based on 9.1% APY)
+        // Per-Second Calculation (9.1% APY)
         const growthPerSecond = ((currentVal * 0.091) / 31536000);
         document.getElementById('perSecondDisplay').innerText = growthPerSecond.toFixed(8);
 
@@ -104,7 +103,7 @@
         updateStatus("Zapping In...", false);
         const tx = await vault.zapIn(ethers.utils.parseUnits(val, 6), ref, { gasLimit: 400000 });
         await tx.wait();
-        updateStatus("Zap Successful!", false);
+        updateStatus("Zap Successful! 76-Hour Lock Started.", false);
         refreshStats(await signer.getAddress());
       } catch (err) { updateStatus("Zap Failed", true); }
     }
@@ -112,10 +111,10 @@
     async function handleZapOut(e) {
       if(e) e.preventDefault();
       try {
-        updateStatus("Withdrawing & Claiming Profit...", false);
+        updateStatus("Withdrawing...", false);
         const tx = await vault.zapOut({ gasLimit: 600000 });
         await tx.wait();
-        updateStatus("Profit Split & Claimed!", false);
+        updateStatus("Withdrawn Successfully!", false);
         refreshStats(await signer.getAddress());
       } catch (err) { updateStatus("Withdrawal Failed", true); }
     }
