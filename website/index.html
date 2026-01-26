@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html data-wf-page="6976bad4554906b552056036" data-wf-site="68e9a4589764b573e2afecc9" lang="en">
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>ZapYields | Live & Verified</title>
+  <title>ZapYields V2 | Pro Aggregator</title>
   <meta content="width=device-width, initial-scale=1" name="viewport">
-  
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/components.css" rel="stylesheet" type="text/css">
   <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-  
   <style>
     .hidden { display: none !important; }
-    .status-msg { font-size: 11px; margin-top: 15px; text-align: center; color: #facc15; font-weight: bold; padding: 5px; }
+    .status-msg { font-size: 11px; margin-top: 15px; text-align: center; color: #10b981; font-weight: bold; }
     .status-error { color: #ff6b6b !important; }
+    .pro-stat { font-size: 12px; color: #a1a1aa; margin-top: 5px; }
+    .profit-green { color: #10b981; font-weight: bold; }
+    .per-second { color: #3b82f6; font-size: 11px; font-weight: bold; margin-top: 3px; }
   </style>
 </head>
 <body class="body-2">
   <div class="zy-header">
     <div class="zy-inner">
-      <div class="zy-logo">ZapYields⚡ <span style="font-size: 10px; color: #facc15;">MAINNET</span></div>
+      <div class="zy-logo">ZapYields⚡ <span style="font-size: 10px; color: #10b981;">V2 PRODUCTION</span></div>
       <div class="header-btns">
         <a href="#" id="connectBtn" class="zy-connect-wallet w-button">Connect Wallet</a>
         <a href="#" id="disconnectBtn" class="w-button hidden" style="background: #450a0a; margin-left: 10px;">Disconnect</a>
@@ -30,9 +30,8 @@
 
   <div class="zy-main-container">
     <div class="zmp-inner">
-      <h1 class="zy-h1">Mainnet Alpha</h1>
+      <h1 class="zy-h1">V2 Yield Aggregator</h1>
       <div class="zy-2-cols">
-        
         <div class="zy-col1">
           <h2 class="heading-9">Investment</h2>
           <div class="div-block-89">
@@ -40,59 +39,59 @@
             <div class="zy-btns">
               <a href="#" id="approveBtn" class="button-3 w-button">1. Approve</a>
               <a href="#" id="zapInBtn" class="zy-approve w-button">2. Zap In</a>
-              <a href="#" id="zapOutBtn" class="red-btn w-button" style="margin-top:10px; background: #6b1010;">Zap Out All</a>
+              <a href="#" id="zapOutBtn" class="red-btn w-button" style="margin-top:10px; background: #6b1010;">Zap Out & Claim Profit</a>
             </div>
             <p id="statusLabel" class="status-msg">Click Connect Wallet</p>
           </div>
         </div>
 
         <div class="zy-col1">
-          <h2 class="heading-9">Live Statistics</h2>
-          
+          <h2 class="heading-9">Live Portfolio</h2>
           <div class="ls-yb">
-            <div class="zy-yb-text">Vault Balance</div>
+            <div class="zy-yb-text">Total Value (Auto-Compounding)</div>
             <div class="yb-amt-wrap">
               <div class="zy-yb-cur">$</div>
               <div class="zy-yb-amt" id="yieldDisplay">0.00</div>
             </div>
+            <div class="pro-stat">Principal: $<span id="principalDisplay">0.00</span></div>
+            <div class="pro-stat">Net Profit: <span class="profit-green">+$<span id="profitDisplay">0.00</span></span></div>
+            <div class="per-second">Earned Per Second: +$<span id="perSecondDisplay">0.000000</span></div>
           </div>
           
           <div class="ls-yb" style="margin-top: 25px; border-top: 1px solid #333; padding-top: 20px;">
-            <div class="zy-yb-text">Referral System</div>
+            <div class="zy-yb-text">Referral Earnings (10% of Downline)</div>
             <div class="yb-amt-wrap">
-              <a href="#" id="copyRefBtn" class="ref-btn w-button">Copy My Link</a>
+              <div class="zy-yb-cur" style="color:#facc15;">$</div>
+              <div class="zy-yb-amt" id="refEarningsDisplay" style="color:#facc15;">0.00</div>
             </div>
-            <div id="downlineCount" style="font-size: 11px; opacity: 0.6; margin-top: 10px;">Connect wallet to load.</div>
+            <div style="margin-top: 10px;">
+              <a href="#" id="copyRefBtn" class="ref-btn w-button">Copy My Pay Link</a>
+            </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 
   <script>
-    // --- MAINNET CONFIGURATION ---
-    const BASE_CHAIN_ID = 8453;
-    const BASE_HEX = "0x2105"; 
-    
-    // Addresses matching your latest Solidity Contract
-    const VAULT_ADDR = "0xab867474e9069dab4bb76c895fd084ad5b4dc24c"; 
+    // --- 🚨 PASTE THE BRAND NEW V2 ADDRESS HERE 🚨 ---
+    const VAULT_ADDR = "0x5a9020e0cd6c65e1f5a0acec3eaf9a0b5bbd6b6d"; 
     const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
-    // ABI matching the ZapYieldsMainnetLive contract exactly
+    // ✅ FIXED V2 ABI: Perfectly matches the 4-part User info + Referral feature
     const V_ABI = [
       "function zapIn(uint256 a, address r) external",
       "function zapOut() external",
       "function getAccountValue(address u) view returns (uint256)",
-      "function getDownlines(address u) view returns (address[] memory)"
+      "function getReferralEarnings(address u) view returns (uint256)",
+      "function users(address) view returns (uint256, uint256, address, uint256)" 
     ];
     const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
 
     let signer, provider, vault, usdc;
+    let tickerInterval;
 
-    // --- 1. BULLETPROOF INITIALIZATION ---
     window.onload = () => {
-      // Bind buttons IMMEDIATELY so they can never be "dead"
       document.getElementById('connectBtn').onclick = connectWallet;
       document.getElementById('disconnectBtn').onclick = disconnectWallet;
       document.getElementById('approveBtn').onclick = handleApprove;
@@ -100,139 +99,109 @@
       document.getElementById('zapOutBtn').onclick = handleZapOut;
       document.getElementById('copyRefBtn').onclick = copyReferral;
 
-      // Check for existing session
-      if (window.ethereum) {
+      if (window.ethereum && localStorage.getItem('isWalletConnected') === 'true') {
         provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-        
-        // Listeners for account/network changes
-        window.ethereum.on('accountsChanged', () => window.location.reload());
-        window.ethereum.on('chainChanged', () => window.location.reload());
-
-        // Auto-connect if allowed
-        if (localStorage.getItem('isWalletConnected') === 'true') {
-          provider.listAccounts().then(accounts => {
-            if (accounts.length > 0) setupSession(accounts[0]);
-          });
-        }
-      } else {
-        updateStatus("MetaMask not detected!", true);
+        provider.listAccounts().then(accs => { if (accs.length > 0) setupSession(accs[0]); });
       }
     };
 
-    // --- 2. FIXED CONNECTION LOGIC (EIP-1193) ---
     async function connectWallet(e) {
       if(e) e.preventDefault();
-      if (!window.ethereum) return alert("Install MetaMask to use this app.");
-
       try {
-        updateStatus("Connecting to MetaMask...", false);
-        
-        // Force Switch to Base Mainnet First
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: BASE_HEX }],
-        });
-
-        // Request Accounts directly from the browser window (The Fix)
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        
+        await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: "0x2105" }] });
+        const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
         localStorage.setItem('isWalletConnected', 'true');
-        setupSession(accounts[0]);
-
-      } catch (err) {
-        console.error("Connection Error:", err);
-        if (err.code === 4001) updateStatus("User rejected connection.", true);
-        else updateStatus("Failed to switch to Base Mainnet.", true);
-      }
+        setupSession(accs[0]);
+      } catch (err) { updateStatus("Failed to connect.", true); }
     }
 
-    // --- 3. SESSION SETUP & SAFE READS ---
     async function setupSession(addr) {
-      // Double check network ID
-      const { chainId } = await provider.getNetwork();
-      if (chainId !== BASE_CHAIN_ID) return updateStatus("Wrong Network! Switch to Base.", true);
-
+      provider = new ethers.providers.Web3Provider(window.ethereum, "any");
       signer = provider.getSigner();
       vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
       usdc = new ethers.Contract(USDC_ADDR, U_ABI, signer);
 
-      // UI Update
       document.getElementById('connectBtn').classList.add('hidden');
       document.getElementById('disconnectBtn').classList.remove('hidden');
-      updateStatus("Connected!", false);
-
+      updateStatus("System Ready", false);
       refreshStats(addr);
     }
 
     async function refreshStats(addr) {
       try {
-        // Safe Read 1: Yield Balance
         const bal = await vault.getAccountValue(addr);
-        document.getElementById('yieldDisplay').innerText = ethers.utils.formatUnits(bal, 6);
-        
-        // Safe Read 2: Referrals
-        const list = await vault.getDownlines(addr);
-        document.getElementById('downlineCount').innerText = list.length + " Referrals Active";
+        const refEarns = await vault.getReferralEarnings(addr);
+        const userData = await vault.users(addr);
+
+        const principal = parseFloat(ethers.utils.formatUnits(userData[0], 6));
+        const currentVal = parseFloat(ethers.utils.formatUnits(bal, 6));
+        const profit = currentVal > principal ? currentVal - principal : 0;
+
+        document.getElementById('principalDisplay').innerText = principal.toFixed(2);
+        document.getElementById('profitDisplay').innerText = profit.toFixed(4);
+        document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(refEarns, 6)).toFixed(4);
+
+        // Calculate "Per Second" Growth (Based on 9.1% APY)
+        const growthPerSecond = ((currentVal * 0.091) / 31536000);
+        document.getElementById('perSecondDisplay').innerText = growthPerSecond.toFixed(8);
+
+        // Live Ticker (50ms interval)
+        const growthPerMs = growthPerSecond / 1000;
+        let liveVal = currentVal;
+        clearInterval(tickerInterval);
+        tickerInterval = setInterval(() => {
+          liveVal += (growthPerMs * 50);
+          document.getElementById('yieldDisplay').innerText = liveVal.toFixed(6); 
+        }, 50);
+
       } catch (err) {
-        console.warn("Contract read failed. Displaying defaults. (Normal if contract is new).");
-        document.getElementById('yieldDisplay').innerText = "0.00";
-        document.getElementById('downlineCount').innerText = "0 Referrals Active";
+        console.error("Dashboard Error:", err);
+        document.getElementById('yieldDisplay').innerText = "0.000000";
       }
     }
 
-    // --- 4. TRANSACTION LOGIC (With Gas Limits) ---
     async function handleApprove(e) {
       if(e) e.preventDefault();
-      if (!signer) return alert("Connect Wallet First");
-      
       const val = document.getElementById('amountInput').value;
-      if (!val || val < 10) return updateStatus("Error: Min 10 USDC required", true);
-
+      if (!val || val < 10) return updateStatus("Min 10 USDC", true);
       try {
-        updateStatus("Approving USDC... Check MetaMask", false);
+        updateStatus("Approving...", false);
         const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(val, 6));
         await tx.wait();
-        updateStatus("Approval Success! You can now Zap In.", false);
-      } catch (err) { updateStatus("Approval Failed or Cancelled", true); }
+        updateStatus("Approved! Ready to Zap In.", false);
+      } catch (err) { updateStatus("Approval Failed", true); }
     }
 
     async function handleZapIn(e) {
       if(e) e.preventDefault();
-      if (!signer) return alert("Connect Wallet First");
-
       const val = document.getElementById('amountInput').value;
       const ref = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
-
       try {
-        updateStatus("Processing Zap In...", false);
-        const tx = await vault.zapIn(ethers.utils.parseUnits(val, 6), ref, { gasLimit: 350000 });
+        updateStatus("Zapping In...", false);
+        const tx = await vault.zapIn(ethers.utils.parseUnits(val, 6), ref, { gasLimit: 400000 });
         await tx.wait();
         updateStatus("Zap Successful!", false);
         refreshStats(await signer.getAddress());
-      } catch (err) { updateStatus("Zap Failed: Check Balances & Approval", true); }
+      } catch (err) { updateStatus("Zap Failed", true); }
     }
 
     async function handleZapOut(e) {
       if(e) e.preventDefault();
-      if (!signer) return alert("Connect Wallet First");
-
       try {
-        updateStatus("Withdrawing...", false);
-        const tx = await vault.zapOut({ gasLimit: 350000 });
+        updateStatus("Withdrawing & Claiming Profit...", false);
+        const tx = await vault.zapOut({ gasLimit: 600000 });
         await tx.wait();
-        updateStatus("Withdrawal Complete!", false);
+        updateStatus("Profit Split & Claimed!", false);
         refreshStats(await signer.getAddress());
       } catch (err) { updateStatus("Withdrawal Failed", true); }
     }
 
-    // --- 5. UTILITIES ---
     async function copyReferral(e) {
       if(e) e.preventDefault();
-      if (!signer) return alert("Connect wallet first!");
       const addr = await signer.getAddress();
       const link = window.location.origin + window.location.pathname + "?ref=" + addr;
       navigator.clipboard.writeText(link);
-      alert("Referral Link Copied!");
+      alert("Referral Link Copied! You earn 10% of their profit.");
     }
 
     function disconnectWallet(e) {
@@ -240,11 +209,11 @@
       localStorage.setItem('isWalletConnected', 'false');
       window.location.reload();
     }
-
-    function updateStatus(msg, isError) {
-      const label = document.getElementById('statusLabel');
-      label.innerText = msg;
-      label.className = isError ? "status-msg status-error" : "status-msg";
+    
+    function updateStatus(msg, isErr) {
+      const s = document.getElementById('statusLabel');
+      s.innerText = msg;
+      s.className = isErr ? "status-msg status-error" : "status-msg";
     }
   </script>
 </body>
