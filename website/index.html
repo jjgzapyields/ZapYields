@@ -3,188 +3,92 @@
 <head>
   <meta charset="utf-8">
   <title>ZapYields | Live Production</title>
-  <meta content="width=device-width, initial-scale=1" name="viewport">
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/components.css" rel="stylesheet" type="text/css">
   <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-  <style>
-    .hidden { display: none !important; }
-    .status-msg { font-size: 11px; margin-top: 15px; text-align: center; color: #facc15; font-weight: bold; }
-    .error-msg { color: #ff6b6b !important; }
-    .wallet-stat { font-size: 10px; opacity: 0.6; margin-top: 4px; }
-  </style>
 </head>
 <body class="body-2">
   <div class="zy-header">
     <div class="zy-inner">
-      <div class="zy-logo">ZapYields⚡ <span style="font-size: 10px; opacity: 0.7;">LIVE</span></div>
+      <div class="zy-logo">ZapYields⚡</div>
       <div class="header-btns">
         <a href="#" id="connectBtn" class="zy-connect-wallet w-button">Connect Wallet</a>
-        <a href="#" id="disconnectBtn" class="w-button hidden" style="background: #450a0a; margin-left: 10px;">Disconnect</a>
+        <a href="#" id="disconnectBtn" class="w-button" style="display:none; background:#450a0a;">Disconnect</a>
       </div>
     </div>
   </div>
 
   <div class="zy-main-container">
     <div class="zmp-inner">
-      <h1 class="zy-h1">Mainnet Alpha</h1>
-      <div class="zy-2-cols">
-        <div class="zy-col1">
-          <h2 class="heading-9">Investment</h2>
-          <div class="div-block-89">
-            <input placeholder="Min 10.00 USDC" type="number" id="amountInput" class="input-field" style="color: white !important;">
-            <div id="walletBalances">
-              <div class="wallet-stat">USDC Balance: <span id="usdcBal">0.00</span></div>
-              <div class="wallet-stat">ETH Gas: <span id="ethBal">0.000</span></div>
-            </div>
-            <div class="zy-btns" style="margin-top: 15px;">
-              <a href="#" id="approveBtn" class="button-3 w-button">1. Approve</a>
-              <a href="#" id="zapInBtn" class="zy-approve w-button">2. Zap In</a>
-              <a href="#" id="zapOutBtn" class="red-btn w-button" style="margin-top:10px; background: #6b1010;">Zap Out All</a>
-            </div>
-            <p id="statusLabel" class="status-msg">System Active</p>
-          </div>
+      <div class="zy-col1">
+        <input placeholder="Amount (Min 10)" type="number" id="amountInput" class="input-field" style="color:white;">
+        <div class="zy-btns">
+          <a href="#" id="approveBtn" class="button-3 w-button">1. Approve</a>
+          <a href="#" id="zapInBtn" class="zy-approve w-button">2. Zap In</a>
+          <a href="#" id="zapOutBtn" class="red-btn w-button" style="margin-top:10px; background:#6b1010;">Zap Out</a>
         </div>
-
-        <div class="zy-col1">
-          <h2 class="heading-9">Live Stats</h2>
-          <div class="ls-yb">
-            <div class="zy-yb-text">Vault Balance</div>
-            <div class="yb-amt-wrap">
-              <div class="zy-yb-cur">$</div>
-              <div id="yieldDisplay" class="zy-yb-amt">0.00</div>
-            </div>
-          </div>
-          
-          <div class="ls-yb" style="margin-top: 25px; border-top: 1px solid #333; padding-top: 20px;">
-            <div class="zy-yb-text">Referral System</div>
-            <div class="yb-amt-wrap">
-              <a href="#" id="copyRefBtn" class="ref-btn w-button">Copy Link</a>
-            </div>
-            <div id="downlineCount" style="font-size: 11px; opacity: 0.5; margin-top: 10px;">Connect to see stats</div>
-          </div>
-        </div>
+        <p id="statusLabel" style="color:#facc15; text-align:center; margin-top:10px;">Ready</p>
+      </div>
+      <div class="ls-yb">
+        <div>Vault Value: <strong id="yieldDisplay">$0.00</strong></div>
       </div>
     </div>
   </div>
 
   <script>
-    const MAINNET_HEX = "0x2105"; 
     const VAULT_ADDR = "0xA81F4E89804f3592bcaAC44Af53639e960aeCC7f"; 
     const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
-
     const V_ABI = [
-      "function zapIn(uint256 a, address r) external",
-      "function zapOut() external",
-      "function getAccountValue(address u) view returns (uint256)",
-      "function getDownlines(address u) view returns (address[] memory)"
-    ];
-    const U_ABI = [
-      "function approve(address s, uint256 a) public returns (bool)",
-      "function balanceOf(address a) view returns (uint256)"
+        "function zapIn(uint256 a, address r) external",
+        "function zapOut() external",
+        "function getAccountValue(address u) view returns (uint256)"
     ];
 
-    let signer, provider, vault, usdc;
+    let signer, provider, vault;
 
     window.onload = async () => {
       if (window.ethereum) {
         provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-        window.ethereum.on('chainChanged', () => window.location.reload());
-        const accounts = await provider.listAccounts();
-        if (accounts.length > 0 && localStorage.getItem('active') === 'true') init(accounts[0]);
+        const accs = await provider.listAccounts();
+        if (accs.length > 0) setup(accs[0]);
       }
       document.getElementById('connectBtn').onclick = connect;
-      document.getElementById('disconnectBtn').onclick = disconnect;
-      document.getElementById('approveBtn').onclick = doApprove;
-      document.getElementById('zapInBtn').onclick = doZapIn;
-      document.getElementById('zapOutBtn').onclick = doZapOut;
-      document.getElementById('copyRefBtn').onclick = doCopy;
     };
 
     async function connect() {
-      try {
-        await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: MAINNET_HEX }] });
-        const accs = await provider.send("eth_requestAccounts", []);
-        localStorage.setItem('active', 'true');
-        init(accs[0]);
-      } catch (e) { alert("Please switch to Base Mainnet"); }
+      const accs = await provider.send("eth_requestAccounts", []);
+      setup(accs[0]);
     }
 
-    async function init(addr) {
+    async function setup(addr) {
       signer = provider.getSigner();
       vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
-      usdc = new ethers.Contract(USDC_ADDR, U_ABI, signer);
-      
-      document.getElementById('connectBtn').classList.add('hidden');
-      document.getElementById('disconnectBtn').classList.remove('hidden');
+      document.getElementById('connectBtn').innerText = addr.substring(0,6) + "...";
       refresh(addr);
     }
 
     async function refresh(addr) {
       try {
+        // Safe Read: Try to get value, if contract reverts, default to 0
         const bal = await vault.getAccountValue(addr);
-        document.getElementById('yieldDisplay').innerText = ethers.utils.formatUnits(bal, 6);
-        
-        const ethRaw = await provider.getBalance(addr);
-        document.getElementById('ethBal').innerText = parseFloat(ethers.utils.formatEther(ethRaw)).toFixed(3);
-        
-        const usdcRaw = await usdc.balanceOf(addr);
-        document.getElementById('usdcBal').innerText = ethers.utils.formatUnits(usdcRaw, 6);
-        
-        const team = await vault.getDownlines(addr);
-        document.getElementById('downlineCount').innerText = team.length + " Referrals active";
-      } catch (e) { console.error("Refresh Error:", e); }
+        document.getElementById('yieldDisplay').innerText = "$" + ethers.utils.formatUnits(bal, 6);
+      } catch (e) {
+        console.warn("Vault is likely empty or uninitialized. Defaulting to 0.");
+        document.getElementById('yieldDisplay').innerText = "$0.00";
+      }
     }
 
-    async function doApprove() {
-      const v = document.getElementById('amountInput').value;
-      if (v < 10) return updateStatus("Min 10 USDC", true);
+    async function zapIn() {
+      const val = document.getElementById('amountInput').value;
       try {
-        updateStatus("Confirming Approval...", false);
-        const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(v, 6));
+        const tx = await vault.zapIn(ethers.utils.parseUnits(val, 6), "0x0000000000000000000000000000000000000000", { gasLimit: 400000 });
         await tx.wait();
-        updateStatus("Approved!", false);
-      } catch (e) { updateStatus("Approval Denied", true); }
-    }
-
-    async function doZapIn() {
-      const v = document.getElementById('amountInput').value;
-      const r = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
-      try {
-        updateStatus("Confirming Zap...", false);
-        // MANUAL GAS LIMIT to fix UNPREDICTABLE_GAS_LIMIT
-        const tx = await vault.zapIn(ethers.utils.parseUnits(v, 6), r, { gasLimit: 350000 });
-        await tx.wait();
-        updateStatus("Success!", false);
         refresh(await signer.getAddress());
-      } catch (e) { updateStatus("Transaction Failed", true); }
+      } catch (e) { alert("Transaction failed. Do you have enough USDC?"); }
     }
 
-    async function doZapOut() {
-      try {
-        updateStatus("Withdrawing...", false);
-        const tx = await vault.zapOut({ gasLimit: 300000 });
-        await tx.wait();
-        updateStatus("Success!", false);
-        refresh(await signer.getAddress());
-      } catch (e) { updateStatus("Withdraw Failed", true); }
-    }
-
-    function doCopy() {
-      signer.getAddress().then(a => {
-        const link = window.location.origin + window.location.pathname + "?ref=" + a;
-        navigator.clipboard.writeText(link);
-        alert("Referral Link Copied!");
-      });
-    }
-
-    function disconnect() { localStorage.setItem('active', 'false'); window.location.reload(); }
-    function updateStatus(m, err) { 
-      const s = document.getElementById('statusLabel');
-      s.innerText = m;
-      s.className = err ? "status-msg error-msg" : "status-msg";
-    }
+    function updateStatus(msg) { document.getElementById('statusLabel').innerText = msg; }
   </script>
 </body>
 </html>
