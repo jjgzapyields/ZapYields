@@ -1,12 +1,14 @@
-const VAULT_ADDR = "0x9501CB9649c5A7529a5d6DEDbE3Bce07d0DEec95";
+const VAULT_ADDR = "0x9501CB9649c5A7529a5d6DEDbE3Bce07d0DEec95"; 
 const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
+// Updated ABI: Added the 'ZapIn' Event so we can count referrals
 const V_ABI = [
   "function zapIn(uint256 a, address r) external",
   "function zapOut() external",
   "function getAccountValue(address u) view returns (uint256)",
   "function getReferralEarnings(address u) view returns (uint256)",
-  "function users(address) view returns (uint256, uint256, address, uint256, uint256)" 
+  "function users(address) view returns (uint256, uint256, address, uint256, uint256)",
+  "event ZapIn(address indexed user, uint256 amount, address indexed referrer)"
 ];
 const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
 
@@ -49,7 +51,7 @@ async function setupSession(addr) {
   refreshStats(addr);
 }
 
-// ✅ ENS ERROR RESOLVED: Checks valid address natively
+// ✅ UPDATED: Now fetches live stats AND counts total recruits.
 async function refreshStats(addr) {
   if (!addr || !ethers.utils.isAddress(addr)) return;
 
@@ -66,13 +68,28 @@ async function refreshStats(addr) {
     document.getElementById('profitDisplay').innerText = profit.toFixed(4);
     document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(refEarns, 6)).toFixed(4);
 
-    // ✅ BUTTON LOGIC: Unlocks "Zap Out" if user has money in the contract
+    // --- BUTTON UNLOCK LOGIC ---
     if (principal > 0) {
       document.getElementById('zapOutBtn').classList.remove('disabled-btn');
     } else {
       document.getElementById('zapOutBtn').classList.add('disabled-btn');
     }
 
+    // --- 🚨 NEW: REFERRAL COUNTER LOGIC ---
+    try {
+      // Look for the ZapIn event where the referrer address matches the current user
+      const filter = vault.filters.ZapIn(null, null, addr);
+      const logs = await vault.queryFilter(filter);
+      
+      // Filter for unique addresses to prevent double counting
+      const uniqueRecruits = new Set(logs.map(log => log.args.user)).size;
+      document.getElementById('refCountDisplay').innerText = uniqueRecruits;
+    } catch (refErr) {
+      console.warn("Could not fetch referral count (Events may not be supported or contract lacks event)", refErr);
+      document.getElementById('refCountDisplay').innerText = "0";
+    }
+
+    // --- YIELD TICKER LOGIC ---
     const growthPerSecond = ((currentVal * 0.091) / 31536000);
     document.getElementById('perSecondDisplay').innerText = growthPerSecond.toFixed(8);
 
@@ -100,7 +117,7 @@ async function handleApprove(e) {
     await tx.wait(); 
     updateStatus("Approved! Ready to Zap In.", false);
     
-    // ✅ BUTTON LOGIC: Unlocks "Zap In" after successful approval
+    // Unlock Zap In
     document.getElementById('zapInBtn').classList.remove('disabled-btn'); 
 
   } catch (err) { updateStatus("Approval Failed", true); }
