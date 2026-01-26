@@ -73,16 +73,16 @@
 
   <script>
     // --- 🚨 UPDATE THIS WITH YOUR V2 CONTRACT ADDRESS 🚨 ---
-    const VAULT_ADDR = "0x02a5eB5b2F48B13c425d9FdC80e135BA593448DC"; 
+    const VAULT_ADDR = "PASTE_V2_ADDRESS_HERE"; 
     const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
-    // 1. UPDATED V2 ABI (Corrected for Tuple Parsing)
+    // ✅ FIXED ABI: Now expects exactly 3 items from the users() mapping
     const V_ABI = [
       "function zapIn(uint256 a, address r) external",
       "function zapOut() external",
       "function getAccountValue(address u) view returns (uint256)",
       "function getReferralEarnings(address u) view returns (uint256)",
-      "function users(address) view returns (uint256, uint256, address, uint256)" 
+      "function users(address) view returns (uint256, uint256, address)" 
     ];
     const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
 
@@ -125,23 +125,27 @@
       refreshStats(addr);
     }
 
-    // 2. UPDATED DISPLAY LOGIC
+    // ✅ FIXED DISPLAY LOGIC
     async function refreshStats(addr) {
       try {
+        // 1. Get raw data
         const bal = await vault.getAccountValue(addr);
-        const userData = await vault.users(addr);
         const refEarns = await vault.getReferralEarnings(addr);
+        
+        // 2. Safely get the 3-part User Data
+        const userData = await vault.users(addr);
 
         // userData[0] is Principal
         const principal = parseFloat(ethers.utils.formatUnits(userData[0], 6));
         const currentVal = parseFloat(ethers.utils.formatUnits(bal, 6));
         const profit = currentVal > principal ? currentVal - principal : 0;
 
+        // 3. Update the HTML displays
         document.getElementById('principalDisplay').innerText = principal.toFixed(2);
         document.getElementById('profitDisplay').innerText = profit.toFixed(4);
         document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(refEarns, 6)).toFixed(4);
 
-        // Start Auto-Compounding Visual Ticker
+        // 4. Start the Ticker
         let liveVal = currentVal;
         const growthPerMs = ((liveVal * 0.091) / 31536000) / 1000;
         clearInterval(tickerInterval);
