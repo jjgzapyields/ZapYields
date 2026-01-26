@@ -72,16 +72,17 @@
   </div>
 
   <script>
-    // --- 🚨 UPDATE WITH YOUR V2 CONTRACT ADDRESS 🚨 ---
+    // --- 🚨 UPDATE THIS WITH YOUR V2 CONTRACT ADDRESS 🚨 ---
     const VAULT_ADDR = "0x02a5eB5b2F48B13c425d9FdC80e135BA593448DC"; 
     const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
+    // 1. UPDATED V2 ABI (Corrected for Tuple Parsing)
     const V_ABI = [
       "function zapIn(uint256 a, address r) external",
       "function zapOut() external",
       "function getAccountValue(address u) view returns (uint256)",
       "function getReferralEarnings(address u) view returns (uint256)",
-      "function users(address u) view returns (uint256 principal, uint256 shareBalance, address referrer, uint256 totalReferralEarnings)"
+      "function users(address) view returns (uint256, uint256, address, uint256)" 
     ];
     const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
 
@@ -124,21 +125,23 @@
       refreshStats(addr);
     }
 
+    // 2. UPDATED DISPLAY LOGIC
     async function refreshStats(addr) {
       try {
         const bal = await vault.getAccountValue(addr);
         const userData = await vault.users(addr);
         const refEarns = await vault.getReferralEarnings(addr);
 
+        // userData[0] is Principal
+        const principal = parseFloat(ethers.utils.formatUnits(userData[0], 6));
         const currentVal = parseFloat(ethers.utils.formatUnits(bal, 6));
-        const principal = parseFloat(ethers.utils.formatUnits(userData.principal, 6));
         const profit = currentVal > principal ? currentVal - principal : 0;
 
         document.getElementById('principalDisplay').innerText = principal.toFixed(2);
         document.getElementById('profitDisplay').innerText = profit.toFixed(4);
         document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(refEarns, 6)).toFixed(4);
 
-        // Live Ticker for Total Value
+        // Start Auto-Compounding Visual Ticker
         let liveVal = currentVal;
         const growthPerMs = ((liveVal * 0.091) / 31536000) / 1000;
         clearInterval(tickerInterval);
@@ -148,6 +151,7 @@
         }, 50);
 
       } catch (err) {
+        console.error("Dashboard Error:", err);
         document.getElementById('yieldDisplay').innerText = "0.000000";
       }
     }
