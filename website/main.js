@@ -1,4 +1,4 @@
-const VAULT_ADDR = window.ENV_VAULT_ADDR; // Pulled from Vercel securely
+let VAULT_ADDR = ""; 
 const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 const V_ABI = [
@@ -13,7 +13,17 @@ const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
 let signer, provider, vault, usdc;
 let tickerInterval;
 
-window.onload = () => {
+window.onload = async () => {
+  // 1. Fetch the secret address from Vercel securely
+  try {
+    const response = await fetch('/api/config');
+    const data = await response.json();
+    VAULT_ADDR = data.vaultAddress;
+  } catch (err) {
+    console.error("Failed to load secure config.");
+  }
+
+  // 2. Load the rest of the site
   document.getElementById('connectBtn').onclick = connectWallet;
   document.getElementById('disconnectBtn').onclick = disconnectWallet;
   document.getElementById('approveBtn').onclick = handleApprove;
@@ -26,6 +36,7 @@ window.onload = () => {
     provider.listAccounts().then(accs => { if (accs.length > 0) setupSession(accs[0]); });
   }
 };
+
 
 async function connectWallet(e) {
   if(e) e.preventDefault();
