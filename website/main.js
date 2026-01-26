@@ -1,4 +1,4 @@
-let VAULT_ADDR = ""; 
+// VAULT_ADDR is already loaded from config.js!
 const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 const V_ABI = [
@@ -13,49 +13,28 @@ const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
 let signer, provider, vault, usdc;
 let tickerInterval;
 
-// 1. App starts immediately on page load
-window.onload = async () => {
-  document.getElementById('connectBtn').classList.add('disabled-btn'); // Lock Connect Button initially
-  updateStatus("Securing connection to Vercel...", false);
+window.onload = () => {
+  // Safety Check: Make sure the Vercel build command worked
+  if (typeof VAULT_ADDR === 'undefined' || !VAULT_ADDR) {
+    updateStatus("Error: Vercel Build Command Failed.", true);
+    return;
+  }
 
-  // 2. Fetch address from Vercel API
-  try {
-    const response = await fetch('/api/config');
-    const data = await response.json();
-    VAULT_ADDR = data.vaultAddress;
+  document.getElementById('connectBtn').onclick = connectWallet;
+  document.getElementById('disconnectBtn').onclick = disconnectWallet;
+  document.getElementById('approveBtn').onclick = handleApprove;
+  document.getElementById('zapInBtn').onclick = handleZapIn;
+  document.getElementById('zapOutBtn').onclick = handleZapOut;
+  document.getElementById('copyRefBtn').onclick = copyReferral;
 
-    // 3. Security Check
-    if (!VAULT_ADDR || !ethers.utils.isAddress(VAULT_ADDR)) {
-      updateStatus("API Error: Contract Address not found in Vercel.", true);
-      return; // STOP THE APP
-    }
-
-    // 4. Success! Unlock the Connect Button
-    updateStatus("Secure connection established. Ready.", false);
-    document.getElementById('connectBtn').classList.remove('disabled-btn');
-
-    // 5. Setup Button Listeners
-    document.getElementById('connectBtn').onclick = connectWallet;
-    document.getElementById('disconnectBtn').onclick = disconnectWallet;
-    document.getElementById('approveBtn').onclick = handleApprove;
-    document.getElementById('zapInBtn').onclick = handleZapIn;
-    document.getElementById('zapOutBtn').onclick = handleZapOut;
-    document.getElementById('copyRefBtn').onclick = copyReferral;
-
-    // 6. Auto-Connect if previously connected
-    if (window.ethereum && localStorage.getItem('isWalletConnected') === 'true') {
-      provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-      provider.listAccounts().then(accs => { if (accs.length > 0) setupSession(accs[0]); });
-    }
-
-  } catch (err) {
-    updateStatus("Critical Error: Vercel API Offline.", true);
+  if (window.ethereum && localStorage.getItem('isWalletConnected') === 'true') {
+    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    provider.listAccounts().then(accs => { if (accs.length > 0) setupSession(accs[0]); });
   }
 };
 
 async function connectWallet(e) {
   if(e) e.preventDefault();
-  if(!VAULT_ADDR) return; // EXTRA LOCK
   try {
     await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: "0x2105" }] });
     const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -67,17 +46,16 @@ async function connectWallet(e) {
 async function setupSession(addr) {
   provider = new ethers.providers.Web3Provider(window.ethereum, "any");
   signer = provider.getSigner();
-  
-  // Create Contract instances
   vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
   usdc = new ethers.Contract(USDC_ADDR, U_ABI, signer);
 
   document.getElementById('connectBtn').classList.add('hidden');
   document.getElementById('disconnectBtn').classList.remove('hidden');
-  updateStatus("Wallet Connected.", false);
+  updateStatus("System Ready", false);
   refreshStats(addr);
 }
 
+// ✅ ENS ERROR GONE: Address is validated strictly.
 async function refreshStats(addr) {
   if (!addr || !ethers.utils.isAddress(addr)) return;
 
