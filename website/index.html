@@ -8,18 +8,16 @@
   <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous">
-  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js" type="text/javascript"></script>
-  <script type="text/javascript">WebFont.load({  google: {    families: ["Oswald:200,300,400,500,600,700","Montserrat:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic","Playfair Display:regular,600,italic,600italic"]  }});</script>
   
   <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
 </head>
 <body class="body-2">
   <div class="zy-header">
     <div class="zy-inner">
-      <a href="#" class="zy-logo w-inline-block">
+      <a href="#" class="zy-logo w-inline-block" style="display: flex; align-items: center; color: white; text-decoration: none;">
         <div class="text-block-31">ZapYields</div>
-        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewbox="0 0 24 25" fill="none" class="ikonik-91jrm" style="display: inline-block !important;">
-          <path d="M8.50001 23.968C8.20001 23.968 7.90001 23.868 7.60001 23.768C6.80001 23.368 6.40001 22.568 6.60001 21.768L7.80001 15.968H6.00001C5.20001 15.968 4.50001 15.468 4.20001 14.768C3.90001 14.068 4.00001 13.268 4.60001 12.768L14.1 2.66801C14.7 2.06801 15.7 1.86801 16.4 2.26801C17.2 2.66801 17.6 3.46801 17.4 4.26801L16.2 10.068H18C18.8 10.068 19.5 10.568 19.8 11.268C20.1 11.968 20 12.768 19.4 13.268L9.90001 23.368C9.50001 23.768 9.00001 23.968 8.50001 23.968Z" fill="currentColor"></path>
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewbox="0 0 24 25" fill="none" style="margin-left: 10px; display: block !important;">
+          <path d="M8.50001 23.968C8.20001 23.968 7.90001 23.868 7.60001 23.768C6.80001 23.368 6.40001 22.568 6.60001 21.768L7.80001 15.968H6.00001C5.20001 15.968 4.50001 15.468 4.20001 14.768C3.90001 14.068 4.00001 13.268 4.60001 12.768L14.1 2.66801C14.7 2.06801 15.7 1.86801 16.4 2.26801C17.2 2.66801 17.6 3.46801 17.4 4.26801L16.2 10.068H18C18.8 10.068 19.5 10.568 19.8 11.268C20.1 11.968 20 12.768 19.4 13.268L9.90001 23.368C9.50001 23.768 9.00001 23.968 8.50001 23.968Z" fill="#facc15"></path>
         </svg>
       </a>
       <a href="#" id="connectBtn" class="zy-connect-wallet w-button">Connect Wallet</a>
@@ -42,7 +40,7 @@
                 <a href="#" id="zapInBtn" class="zy-approve w-button">2. Zap In</a>
                 <a href="#" id="zapOutBtn" class="red-btn w-button">ZAP OUT ALL</a>
               </div>
-              <p id="statusLabel" style="font-size: 11px; margin-top: 10px; color: #facc15; text-align: center;">Ready</p>
+              <p id="statusLabel" style="font-size: 11px; margin-top: 10px; color: #facc15; text-align: center; min-height: 15px;">Ready</p>
             </div>
           </div>
           <div class="zy-col1">
@@ -51,19 +49,14 @@
               <div class="zy-yb-text">Yield Balance</div>
               <div class="yb-amt-wrap">
                 <div class="zy-yb-cur">$</div>
-                <div class="zy-yb-amt" id="yieldBalanceDisplay">0.00</div>
-              </div>
-            </div>
-            <div class="ls-yb">
-              <div class="zy-yb-text">Referral Link</div>
-              <div class="yb-amt-wrap">
-                <a href="#" id="copyLinkBtn" class="ref-btn w-button">Copy Link</a>
+                <div class="zy-yb-amt" id="yieldDisplay">0.00</div>
               </div>
             </div>
             <div class="ls-dl">
               <div class="zy-yb-text">Your Team (Downlines)</div>
-              <div id="downlineList" class="text-block-32"><em class="italic-text-4">Connect wallet to see referrals.</em></div>
+              <div id="downlineList" class="text-block-32" style="font-size: 12px; opacity: 0.8;">Connect wallet to see referrals.</div>
             </div>
+            <a href="#" id="copyRefBtn" class="ref-btn w-button" style="margin-top: 10px;">Copy Referral Link</a>
           </div>
         </div>
       </div>
@@ -79,26 +72,34 @@
       "function getAccountValue(address _user) external view returns (uint256)",
       "function getDownlines(address _user) external view returns (address[] memory)"
     ];
-    const USDC_ABI = [
-      "function approve(address spender, uint256 amount) public returns (bool)"
-    ];
+    const USDC_ABI = ["function approve(address spender, uint256 amount) public returns (bool)"];
 
     let signer, vaultContract, usdcContract;
 
-    // Use DOMContentLoaded to prevent "null" errors
+    // Use DOMContentLoaded to ensure elements exist
     document.addEventListener("DOMContentLoaded", () => {
+      console.log("DOM Ready. Initializing listeners...");
       document.getElementById('connectBtn').onclick = connectWallet;
       document.getElementById('approveBtn').onclick = handleApprove;
       document.getElementById('zapInBtn').onclick = handleZapIn;
       document.getElementById('zapOutBtn').onclick = handleZapOut;
-      document.getElementById('copyLinkBtn').onclick = copyReferral;
+      document.getElementById('copyRefBtn').onclick = copyReferral;
     });
 
     async function connectWallet(e) {
       if(e) e.preventDefault();
-      if (typeof window.ethereum !== 'undefined') {
+      updateStatus("Connecting...");
+      
+      if (window.ethereum) {
         try {
           const provider = new ethers.providers.Web3Provider(window.ethereum);
+          // Re-check network
+          const network = await provider.getNetwork();
+          if (network.chainId !== 84532) {
+             updateStatus("Switch to Base Sepolia!");
+             return alert("Please switch your MetaMask to Base Sepolia (Chain ID 84532)");
+          }
+
           await provider.send("eth_requestAccounts", []);
           signer = provider.getSigner();
           const addr = await signer.getAddress();
@@ -107,10 +108,16 @@
           usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, signer);
 
           document.getElementById('connectBtn').innerText = addr.substring(0,6) + "...";
-          updateStatus("Wallet Connected");
+          updateStatus("Connected!");
           refreshStats(addr);
-        } catch (err) { updateStatus("Connection Error"); }
-      } else { alert("MetaMask not detected. Use http://localhost"); }
+        } catch (err) { 
+          console.error("Connection error detail:", err);
+          updateStatus("Connection Error: Check Console"); 
+        }
+      } else { 
+        updateStatus("No Wallet Detected");
+        alert("MetaMask not found. Please ensure you are using a local server (http://localhost).");
+      }
     }
 
     async function handleApprove(e) {
@@ -121,7 +128,7 @@
         updateStatus("Approving...");
         const tx = await usdcContract.approve(VAULT_ADDRESS, ethers.utils.parseUnits(val, 6));
         await tx.wait();
-        updateStatus("Approved!");
+        updateStatus("USDC Approved!");
       } catch (err) { updateStatus("Approve Failed"); }
     }
 
@@ -133,7 +140,7 @@
         const ref = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
         const tx = await vaultContract.zapIn(ethers.utils.parseUnits(val, 6), ref);
         await tx.wait();
-        updateStatus("Success!");
+        updateStatus("Zap Success!");
         refreshStats(await signer.getAddress());
       } catch (err) { updateStatus("Zap Failed"); }
     }
@@ -144,7 +151,7 @@
         updateStatus("Withdrawing...");
         const tx = await vaultContract.zapOut();
         await tx.wait();
-        updateStatus("Withdrawn!");
+        updateStatus("Withdrawal Done!");
         refreshStats(await signer.getAddress());
       } catch (err) { updateStatus("Withdraw Error"); }
     }
@@ -152,23 +159,30 @@
     async function refreshStats(addr) {
       try {
         const bal = await vaultContract.getAccountValue(addr);
-        document.getElementById('yieldBalanceDisplay').innerText = ethers.utils.formatUnits(bal, 6);
+        document.getElementById('yieldDisplay').innerText = ethers.utils.formatUnits(bal, 6);
+        
         const downs = await vaultContract.getDownlines(addr);
         if(downs.length > 0) {
-            document.getElementById('downlineList').innerHTML = downs.map(d => `<div style="font-size:10px;">${d}</div>`).join('');
+          document.getElementById('downlineList').innerHTML = downs.map(d => 
+            `<div style="margin-bottom:4px; font-family: monospace;">${d.substring(0,25)}...</div>`
+          ).join('');
         }
-      } catch (err) { console.error(err); }
+      } catch (err) { console.error("Stats error", err); }
     }
 
     async function copyReferral(e) {
       if(e) e.preventDefault();
+      if(!signer) return alert("Connect Wallet First");
       const addr = await signer.getAddress();
       const link = window.location.origin + window.location.pathname + "?ref=" + addr;
       navigator.clipboard.writeText(link);
-      alert("Referral Link Copied!");
+      alert("Link Copied: " + link);
     }
 
-    function updateStatus(msg) { document.getElementById('statusLabel').innerText = msg; }
+    function updateStatus(msg) { 
+      document.getElementById('statusLabel').innerText = msg; 
+      console.log("App Status:", msg);
+    }
   </script>
 </body>
 </html>
