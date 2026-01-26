@@ -1,4 +1,4 @@
-// VAULT_ADDR is already loaded from config.js!
+const VAULT_ADDR = "0x9501CB9649c5A7529a5d6DEDbE3Bce07d0DEec95"; 
 const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 const V_ABI = [
@@ -14,12 +14,6 @@ let signer, provider, vault, usdc;
 let tickerInterval;
 
 window.onload = () => {
-  // Safety Check: Make sure the Vercel build command worked
-  if (typeof VAULT_ADDR === 'undefined' || !VAULT_ADDR) {
-    updateStatus("Error: Vercel Build Command Failed.", true);
-    return;
-  }
-
   document.getElementById('connectBtn').onclick = connectWallet;
   document.getElementById('disconnectBtn').onclick = disconnectWallet;
   document.getElementById('approveBtn').onclick = handleApprove;
@@ -55,7 +49,7 @@ async function setupSession(addr) {
   refreshStats(addr);
 }
 
-// ✅ ENS ERROR GONE: Address is validated strictly.
+// ✅ ENS ERROR RESOLVED: Checks valid address natively
 async function refreshStats(addr) {
   if (!addr || !ethers.utils.isAddress(addr)) return;
 
@@ -72,6 +66,7 @@ async function refreshStats(addr) {
     document.getElementById('profitDisplay').innerText = profit.toFixed(4);
     document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(refEarns, 6)).toFixed(4);
 
+    // ✅ BUTTON LOGIC: Unlocks "Zap Out" if user has money in the contract
     if (principal > 0) {
       document.getElementById('zapOutBtn').classList.remove('disabled-btn');
     } else {
@@ -104,7 +99,10 @@ async function handleApprove(e) {
     const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(val, 6));
     await tx.wait(); 
     updateStatus("Approved! Ready to Zap In.", false);
+    
+    // ✅ BUTTON LOGIC: Unlocks "Zap In" after successful approval
     document.getElementById('zapInBtn').classList.remove('disabled-btn'); 
+
   } catch (err) { updateStatus("Approval Failed", true); }
 }
 
