@@ -57,11 +57,7 @@
           </div>
           
           <div class="ls-yb" style="margin-top: 25px; border-top: 1px solid #333; padding-top: 20px;">
-            <div class="zy-yb-text">Referral Earnings (10% of Downline Yield)</div>
-            <div class="yb-amt-wrap">
-              <div class="zy-yb-cur" style="color:#facc15;">$</div>
-              <div class="zy-yb-amt" id="refEarningsDisplay" style="color:#facc15;">0.00</div>
-            </div>
+            <div class="zy-yb-text">Referral System Active</div>
             <div style="margin-top: 10px;">
               <a href="#" id="copyRefBtn" class="ref-btn w-button">Copy My Pay Link</a>
             </div>
@@ -72,16 +68,15 @@
   </div>
 
   <script>
-    // --- 🚨 UPDATE THIS WITH YOUR V2 CONTRACT ADDRESS 🚨 ---
+    // --- 🚨 PASTE THE CONTRACT ADDRESS YOU JUST DEPOSITED INTO HERE 🚨 ---
     const VAULT_ADDR = "0x02a5eB5b2F48B13c425d9FdC80e135BA593448DC"; 
     const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
-    // ✅ FIXED ABI: Now expects exactly 3 items from the users() mapping to stop CALL_EXCEPTION
+    // ✅ FIXED ABI: Removed the "Referral Earnings" call that was crashing the site
     const V_ABI = [
       "function zapIn(uint256 a, address r) external",
       "function zapOut() external",
       "function getAccountValue(address u) view returns (uint256)",
-      "function getReferralEarnings(address u) view returns (uint256)",
       "function users(address) view returns (uint256, uint256, address)" 
     ];
     const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
@@ -125,14 +120,10 @@
       refreshStats(addr);
     }
 
-    // ✅ FIXED DISPLAY LOGIC
     async function refreshStats(addr) {
       try {
-        // 1. Get raw data
+        // 1. Get raw data - WITHOUT asking for referral earnings
         const bal = await vault.getAccountValue(addr);
-        const refEarns = await vault.getReferralEarnings(addr);
-        
-        // 2. Safely get the 3-part User Data
         const userData = await vault.users(addr);
 
         // userData[0] is Principal
@@ -140,12 +131,11 @@
         const currentVal = parseFloat(ethers.utils.formatUnits(bal, 6));
         const profit = currentVal > principal ? currentVal - principal : 0;
 
-        // 3. Update the HTML displays
+        // 2. Update HTML
         document.getElementById('principalDisplay').innerText = principal.toFixed(2);
         document.getElementById('profitDisplay').innerText = profit.toFixed(4);
-        document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(refEarns, 6)).toFixed(4);
 
-        // 4. Start the Ticker
+        // 3. Start the Live Ticker
         let liveVal = currentVal;
         const growthPerMs = ((liveVal * 0.091) / 31536000) / 1000;
         clearInterval(tickerInterval);
@@ -188,7 +178,7 @@
     async function handleZapOut(e) {
       if(e) e.preventDefault();
       try {
-        updateStatus("Withdrawing & Paying Referrals...", false);
+        updateStatus("Withdrawing & Claiming Profit...", false);
         const tx = await vault.zapOut({ gasLimit: 600000 });
         await tx.wait();
         updateStatus("Profit Claimed!", false);
@@ -201,7 +191,7 @@
       const addr = await signer.getAddress();
       const link = window.location.origin + window.location.pathname + "?ref=" + addr;
       navigator.clipboard.writeText(link);
-      alert("Referral Link Copied! You earn 10% of their profit.");
+      alert("Referral Link Copied!");
     }
 
     function disconnectWallet(e) {
