@@ -1,64 +1,88 @@
-# ⚡ ZapYields
+# ZapYields Mainnet Alpha ⚡
 
-![License](https://img.shields.io/badge/License-MIT-green.svg)
-![Network](https://img.shields.io/badge/Network-Base-blue.svg)
-![Status](https://img.shields.io/badge/Status-Active-success.svg)
+[![Network](https://img.shields.io/badge/Network-Base_Mainnet-blue)](https://base.org)
+[![Solidity](https://img.shields.io/badge/Solidity-%5E0.8.20-363636.svg)](https://soliditylang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **Zap in. Earn out.** > The first gamified yield aggregator on the Base Network.
-
-## 📖 Overview
-
-**ZapYields** is a decentralized yield aggregator built on **Base**. It allows users to "Zap" their **USDC** directly into a high-yield lending position powered by **Moonwell**, while participating in an on-chain, gamified referral ecosystem.
-
-Unlike traditional referral systems, ZapYields **never touches your principal**. Commissions are paid strictly from the *yield generated*, ensuring your deposit remains 100% asset-backed.
+ZapYields is a decentralized yield aggregator built on the Base network. It simplifies access to institutional-grade DeFi by allowing users to deposit USDC into the $100M+ Moonwell Flagship MetaMorpho Vault with a single click, earning high-yield APY with zero price volatility.
 
 ---
 
-## 🚀 Key Features
-
-* **🛡️ 100% Asset-Backed:** All deposits are routed to Moonwell (mUSDC), ensuring institutional-grade security.
-* **💸 Yield Streaming:** Interest accrues every block (approx. 2 seconds).
-* **⚡ Zap Technology:** One-click deposit mechanism that bundles approval, minting, and staking.
-* **🔒 Non-Custodial:** You maintain ownership of your funds. The protocol only manages the *profit share*.
-
----
-
-## 🔋 The Energy Tier System
-
-Referrers earn a continuous share of their downline's interest based on their own deposit level. Upgrade your tier to capture more value from your network.
-
-| Tier Name | Required Deposit | Commission Rate (Share of Profit) |
-| :--- | :--- | :--- |
-| **⚡ Spark** | $50 USDC | **10%** |
-| **⚡ Volt** | $100 USDC | **20%** |
-| **⚡ Surge** | $200 USDC | **30%** |
-| **⚡ Thunder** | $1,000 USDC | **50%** |
-| **⚡ Lightning** | $5,000 USDC | **80%** |
+## 📑 Table of Contents
+- [Features](#-features)
+- [System Architecture](#-system-architecture)
+- [Smart Contract Details](#-smart-contract-details)
+- [Frontend Integration](#-frontend-integration)
+- [Usage Guide](#-usage-guide)
+- [Security](#-security)
+- [Roadmap (V2)](#-roadmap-v2)
 
 ---
 
-## ⚙️ Fees & Limits
+## ✨ Features
 
-To ensure protocol sustainability and prevent abuse, the following fee structure is enforced by the smart contract:
-
-1.  **Network Fee:** A flat **$2.00 USDC** fee is charged on every withdrawal to cover gas and automation costs.
-2.  **Performance Fee:** The protocol takes a **10% cut** of the *profit only*. (If you make no profit, we take no percentage).
-3.  **Anti-Whale Timer:** A **36-hour lockup** applies to new deposits.
-    * *Standard Withdrawal:* After 36 hours (Standard fees apply).
-    * *Emergency Withdrawal:* Before 36 hours (1% penalty on total principal).
+* **1-Click Yield:** Streamlined UX for depositing USDC into complex MetaMorpho vaults.
+* **Auto-Compounding:** Interest is automatically baked into the share value (ERC-4626 standard).
+* **Live Yield Ticker:** Optimistic frontend rendering shows micro-yield growth every 50ms.
+* **Decentralized Referral System:** Immutable on-chain tracking for user downlines.
+* **Low Gas Fees:** Fully optimized for the Base L2 network.
 
 ---
 
-## ⛓️ Contract Addresses (Base Mainnet)
+## 🏗 System Architecture
 
-| Contract | Address |
-| :--- | :--- |
-| **ZapYields Vault** | `0x...[PASTE_YOUR_CONTRACT_ADDRESS_HERE]...` |
-| **USDC (Base)** | `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` |
-| **Moonwell (mUSDC)** | `0xEdc817A28E8B93B03976FBd4a3dDBc9f7D176c22` |
+The protocol uses a dual-layer approach:
+1. **The Vault (Smart Contract):** Holds user state, accepts deposits, and interacts with the Moonwell standard interfaces.
+2. **The Aggregator (Morpho):** The external yield source that lends the USDC to over-collateralized borrowers.
 
 ---
 
-## ⚠️ Disclaimer
+## 💻 Smart Contract Details
 
-*This project is experimental software. While it relies on audited protocols (Moonwell/Aave), smart contracts carry inherent risk. Never deposit more than you can afford to lose. ZapYields provides access to DeFi yields but does not guarantee them.*
+**Network:** Base Mainnet  
+**USDC Address:** `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`  
+**Moonwell mUSDC Vault:** `0xc1256Ae5FF1cf2719D4937adb3bbCCab2E00A2Ca`  
+
+### Core Functions
+
+<details>
+<summary><code>zapIn(uint256 _amount, address _referrer)</code></summary>
+
+* Transfers user USDC to the contract.
+* Registers the `_referrer` (if new user).
+* Approves and deposits USDC into the Morpho Vault.
+* Credits the user with corresponding Morpho Shares.
+* *Min Deposit: 10 USDC*
+</details>
+
+<details>
+<summary><code>zapOut()</code></summary>
+
+* Checks user share balance.
+* Redeems 100% of shares from Morpho back to USDC.
+* Transfers Principal + Profit back to the user.
+* Resets user ledger to `0`.
+</details>
+
+<details>
+<summary><code>getAccountValue(address _user)</code></summary>
+
+* A `view` function that interacts with Morpho's `convertToAssets` to calculate the live USD value of a user's shares.
+</details>
+
+---
+
+## 🖥 Frontend Integration
+
+The DApp uses standard HTML/CSS/JS with **Ethers.js (v5.7.2)** for Web3 connectivity.
+
+**Key UI Logic (The Optimistic Ticker):**
+Due to blockchain block times (2s), real-time yield is rendered optimistically using a JS interval:
+```javascript
+// Calculates growth per millisecond based on 9.1% APY
+const growthPerMs = ((currentVal * 0.091) / 31536000) / 1000;
+
+setInterval(() => {
+  liveVal += (growthPerMs * 50);
+  document.getElementById('yieldDisplay').innerText = liveVal.toFixed(6); 
+}, 50);
