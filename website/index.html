@@ -2,11 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>ZapYield | Persistent Session</title>
+  <title>ZapYield | Persistent & Manual Session</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/components.css" rel="stylesheet" type="text/css">
   <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
+  <style>
+    .hidden { display: none !important; }
+    #disconnectBtn { background-color: #450a0a; color: #f87171; border: 1px solid #7f1d1d; margin-left: 10px; }
+  </style>
 </head>
 <body class="body-2">
   <div class="zy-header">
@@ -14,7 +18,10 @@
       <a href="#" class="zy-logo w-inline-block">
         <div class="text-block-31">ZapYields</div>
       </a>
-      <a href="#" id="connectBtn" class="zy-connect-wallet w-button">Connect Wallet</a>
+      <div class="header-btns">
+        <a href="#" id="connectBtn" class="zy-connect-wallet w-button">Connect Wallet</a>
+        <a href="#" id="disconnectBtn" class="w-button hidden">Disconnect</a>
+      </div>
     </div>
   </div>
 
@@ -51,35 +58,60 @@
 
     let signer, provider, vault;
 
-    // --- AUTOMATIC LOAD LOGIC ---
     window.onload = async () => {
       document.getElementById('connectBtn').onclick = connect;
+      document.getElementById('disconnectBtn').onclick = disconnect;
       
       if (window.ethereum) {
         provider = new ethers.providers.Web3Provider(window.ethereum);
         
-        // 1. Check if we already have permission (Silent Check)
+        // Auto-connect ONLY if the user hasn't explicitly disconnected recently
+        const isDisconnected = localStorage.getItem('userDisconnected') === 'true';
+        
         const accounts = await provider.listAccounts();
-        if (accounts.length > 0) {
-          console.log("Found existing session for:", accounts[0]);
+        if (accounts.length > 0 && !isDisconnected) {
           setupWallet(accounts[0]);
         } else {
           updateStatus("Wallet Disconnected");
         }
 
-        // 2. Listen for Account Changes (Auto-switch)
-        window.ethereum.on('accountsChanged', (newAccounts) => {
-          if (newAccounts.length > 0) setupWallet(newAccounts[0]);
-          else window.location.reload();
+        window.ethereum.on('accountsChanged', (accounts) => {
+          if (accounts.length > 0) {
+            localStorage.removeItem('userDisconnected');
+            setupWallet(accounts[0]);
+          } else {
+            disconnect();
+          }
         });
       }
     };
 
     async function connect() {
       if (!window.ethereum) return alert("MetaMask not found!");
-      updateStatus("Requesting Connection...");
-      const accounts = await provider.send("eth_requestAccounts", []);
-      setupWallet(accounts[0]);
+      try {
+        const accounts = await provider.send("eth_requestAccounts", []);
+        localStorage.removeItem('userDisconnected'); // Clear disconnect flag
+        setupWallet(accounts[0]);
+      } catch (err) { console.error(err); }
+    }
+
+    function disconnect(e) {
+      if(e) e.preventDefault();
+      
+      // 1. Set a flag so it doesn't auto-connect on refresh
+      localStorage.setItem('userDisconnected', 'true');
+      
+      // 2. Clear app state
+      signer = null;
+      vault = null;
+      
+      // 3. UI Reset
+      document.getElementById('connectBtn').innerText = "Connect Wallet";
+      document.getElementById('connectBtn').classList.remove('hidden');
+      document.getElementById('disconnectBtn').classList.add('hidden');
+      document.getElementById('welcomeText').innerText = "Welcome to ZapYields";
+      document.getElementById('yieldBalance').innerText = "0.00";
+      updateStatus("Wallet Disconnected");
     }
 
     async function setupWallet(addr) {
@@ -87,8 +119,9 @@
       vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
       
       document.getElementById('connectBtn').innerText = addr.substring(0,6) + "...";
-      document.getElementById('welcomeText').innerText = "Welcome Back!";
-      updateStatus("Session Restored");
+      document.getElementById('disconnectBtn').classList.remove('hidden');
+      document.getElementById('welcomeText').innerText = "Wallet Active";
+      updateStatus("Session Active");
       refresh(addr);
     }
 
