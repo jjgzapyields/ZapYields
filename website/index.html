@@ -2,19 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>ZapYield | Connection Fix</title>
+  <title>ZapYield | Fixed & Compiled</title>
   
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" type="application/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   
-  <script>
-    if (typeof ethers === 'undefined') {
-      console.log("Primary CDN failed. Loading backup...");
-      var script = document.createElement('script');
-      script.src = "https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js";
-      document.head.appendChild(script);
-    }
-  </script>
-
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/components.css" rel="stylesheet" type="text/css">
   <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
@@ -24,7 +15,7 @@
     <div class="zy-inner">
       <a href="#" class="zy-logo w-inline-block" style="display: flex; align-items: center; color: white; text-decoration: none;">
         <div class="text-block-31">ZapYields</div>
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewbox="0 0 24 25" fill="none" style="margin-left: 10px; display: block !important;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 25" fill="none" style="margin-left: 10px;">
           <path d="M8.50001 23.968C8.20001 23.968 7.90001 23.868 7.60001 23.768C6.80001 23.368 6.40001 22.568 6.60001 21.768L7.80001 15.968H6.00001C5.20001 15.968 4.50001 15.468 4.20001 14.768C3.90001 14.068 4.00001 13.268 4.60001 12.768L14.1 2.66801C14.7 2.06801 15.7 1.86801 16.4 2.26801C17.2 2.66801 17.6 3.46801 17.4 4.26801L16.2 10.068H18C18.8 10.068 19.5 10.568 19.8 11.268C20.1 11.968 20 12.768 19.4 13.268L9.90001 23.368C9.50001 23.768 9.00001 23.968 8.50001 23.968Z" fill="#facc15"></path>
         </svg>
       </a>
@@ -34,19 +25,19 @@
 
   <div class="zy-main-container">
     <div class="zy-main-app">
-      <div class="zmp-inner text-center">
-        <h1 class="zy-h1">Welcome to ZapYields<br><span class="text-span">Alpha Version 1.0</span></h1>
+      <div class="zmp-inner">
+        <h1 class="zy-h1">ZapYields Alpha<br><span class="text-span" id="networkStatus">Network: Checking...</span></h1>
         <div class="zy-2-cols">
           <div class="zy-col1">
             <h2 class="heading-9">Vault Action</h2>
             <div class="div-block-89">
-              <input placeholder="10" type="number" id="amountInput" class="input-field" style="color: black !important; margin-bottom: 10px;">
+              <input placeholder="10" type="number" id="amountInput" class="input-field" style="color: black !important;">
               <div class="zy-btns">
                 <a href="#" id="approveBtn" class="button-3 w-button">1. Approve</a>
                 <a href="#" id="zapInBtn" class="zy-approve w-button">2. Zap In</a>
                 <a href="#" id="zapOutBtn" class="red-btn w-button">ZAP OUT ALL</a>
               </div>
-              <p id="statusLabel" style="font-size: 11px; margin-top: 15px; color: #facc15;">Checking Library...</p>
+              <p id="statusLabel" style="font-size: 11px; margin-top: 15px; color: #facc15; text-align: center;">Ready</p>
             </div>
           </div>
           <div class="zy-col1">
@@ -54,8 +45,8 @@
             <div class="ls-yb">
               <div class="zy-yb-text">Yield Balance: $<span id="yieldDisplay">0.00</span></div>
             </div>
-            <div id="downlineList" class="text-block-32" style="font-size: 11px; margin-top: 10px;">Referrals will appear here.</div>
-            <a href="#" id="copyRefBtn" class="ref-btn w-button" style="margin-top: 10px;">Copy Link</a>
+            <div id="downlineList" class="text-block-32" style="font-size: 11px; margin-top: 10px;">Connect wallet to see team.</div>
+            <a href="#" id="copyRefBtn" class="ref-btn w-button" style="margin-top: 10px;">Copy Referral Link</a>
           </div>
         </div>
       </div>
@@ -63,6 +54,7 @@
   </div>
 
   <script>
+    const BASE_SEPOLIA_ID = "0x14a34"; // 84532 in hex
     const VAULT_ADDRESS = "0x2392e90da0f0De5FD1Fa0978a244CcEE23b6CeF2";
     const USDC_ADDRESS = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
     const VAULT_ABI = [
@@ -71,18 +63,10 @@
       "function getAccountValue(address _user) external view returns (uint256)",
       "function getDownlines(address _user) external view returns (address[] memory)"
     ];
-    const USDC_ABI = ["function approve(address spender, uint256 amount) public returns (bool)"];
 
     let signer, vaultContract, usdcContract;
 
     window.onload = () => {
-      // Check if library loaded successfully
-      if (typeof ethers !== 'undefined') {
-        document.getElementById('statusLabel').innerText = "System Ready - Please Connect Wallet";
-      } else {
-        document.getElementById('statusLabel').innerText = "Critical Error: Library Failed to Load";
-      }
-
       document.getElementById('connectBtn').onclick = connectWallet;
       document.getElementById('approveBtn').onclick = handleApprove;
       document.getElementById('zapInBtn').onclick = handleZapIn;
@@ -90,10 +74,33 @@
       document.getElementById('copyRefBtn').onclick = copyReferral;
     };
 
+    async function checkNetwork() {
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      if (chainId !== BASE_SEPOLIA_ID) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: BASE_SEPOLIA_ID }],
+          });
+        } catch (err) {
+            // This error code indicates that the chain has not been added to MetaMask.
+            if (err.code === 4902) {
+              alert("Please add Base Sepolia to MetaMask.");
+            }
+        }
+        return false;
+      }
+      document.getElementById('networkStatus').innerText = "Network: Base Sepolia";
+      return true;
+    }
+
     async function connectWallet(e) {
       if(e) e.preventDefault();
-      if (typeof window.ethereum === 'undefined') return alert("MetaMask not found. Use http://localhost");
+      if (!window.ethereum) return alert("Install MetaMask & use a local server!");
       
+      const onCorrectNetwork = await checkNetwork();
+      if(!onCorrectNetwork) return;
+
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
@@ -104,53 +111,64 @@
 
         const addr = await signer.getAddress();
         document.getElementById('connectBtn').innerText = addr.substring(0,6) + "...";
-        document.getElementById('statusLabel').innerText = "Wallet Connected!";
+        updateStatus("Connected!");
         refreshStats(addr);
       } catch (err) { 
         console.error(err);
-        document.getElementById('statusLabel').innerText = "Connection Failed"; 
+        updateStatus("Connection Error: Check Console"); 
+      }
+    }
+
+    async function refreshStats(addr) {
+      try {
+        // The CALL_EXCEPTION happened here because of the wrong network
+        const bal = await vaultContract.getAccountValue(addr);
+        document.getElementById('yieldDisplay').innerText = ethers.utils.formatUnits(bal, 6);
+        
+        const downs = await vaultContract.getDownlines(addr);
+        if(downs.length > 0) {
+            document.getElementById('downlineList').innerHTML = downs.map(d => `<div style="font-size:10px;">${d}</div>`).join('');
+        }
+      } catch (err) { 
+        console.error("Stats Error:", err);
+        updateStatus("Error Reading Vault Data");
       }
     }
 
     async function handleApprove(e) {
       if(e) e.preventDefault();
       const val = document.getElementById('amountInput').value;
-      if (val < 10) return alert("Minimum 10 USDC");
+      if (val < 10) return alert("Min 10 USDC");
       try {
-        document.getElementById('statusLabel').innerText = "Approving...";
+        updateStatus("Approving...");
         const tx = await usdcContract.approve(VAULT_ADDRESS, ethers.utils.parseUnits(val, 6));
         await tx.wait();
-        document.getElementById('statusLabel').innerText = "Approved! Ready to Zap.";
-      } catch (err) { document.getElementById('statusLabel').innerText = "Approve Failed"; }
+        updateStatus("Approved!");
+      } catch (err) { updateStatus("Approve Failed"); }
     }
 
     async function handleZapIn(e) {
       if(e) e.preventDefault();
       try {
         const val = document.getElementById('amountInput').value;
-        document.getElementById('statusLabel').innerText = "Zapping...";
+        updateStatus("Zapping...");
         const ref = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
         const tx = await vaultContract.zapIn(ethers.utils.parseUnits(val, 6), ref);
         await tx.wait();
-        document.getElementById('statusLabel').innerText = "Success!";
+        updateStatus("Success!");
         refreshStats(await signer.getAddress());
-      } catch (err) { document.getElementById('statusLabel').innerText = "Zap Failed"; }
+      } catch (err) { updateStatus("Zap Failed"); }
     }
 
     async function handleZapOut(e) {
       if(e) e.preventDefault();
       try {
-        document.getElementById('statusLabel').innerText = "Withdrawing...";
+        updateStatus("Withdrawing...");
         const tx = await vaultContract.zapOut();
         await tx.wait();
-        document.getElementById('statusLabel').innerText = "Withdrawal Done!";
+        updateStatus("Withdrawn!");
         refreshStats(await signer.getAddress());
-      } catch (err) { document.getElementById('statusLabel').innerText = "Withdraw Error"; }
-    }
-
-    async function refreshStats(addr) {
-      const bal = await vaultContract.getAccountValue(addr);
-      document.getElementById('yieldDisplay').innerText = ethers.utils.formatUnits(bal, 6);
+      } catch (err) { updateStatus("Withdraw Error"); }
     }
 
     async function copyReferral(e) {
@@ -158,8 +176,10 @@
       const addr = await signer.getAddress();
       const link = window.location.origin + window.location.pathname + "?ref=" + addr;
       navigator.clipboard.writeText(link);
-      alert("Link Copied!");
+      alert("Referral Link Copied!");
     }
+
+    function updateStatus(msg) { document.getElementById('statusLabel').innerText = msg; }
   </script>
 </body>
 </html>
