@@ -13,44 +13,49 @@ const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
 let signer, provider, vault, usdc;
 let tickerInterval;
 
+// 1. App starts immediately on page load
 window.onload = async () => {
-  // 1. Fetch address from Vercel API
+  document.getElementById('connectBtn').classList.add('disabled-btn'); // Lock Connect Button initially
+  updateStatus("Securing connection to Vercel...", false);
+
+  // 2. Fetch address from Vercel API
   try {
     const response = await fetch('/api/config');
     const data = await response.json();
     VAULT_ADDR = data.vaultAddress;
 
-    // ✅ SAFETY LOCK: Stop everything if the address isn't valid
-    if (!VAULT_ADDR || VAULT_ADDR === "" || !ethers.utils.isAddress(VAULT_ADDR)) {
-      console.error("FATAL ERROR: Vault Address not found or invalid. Check Vercel Env Variables.");
-      updateStatus("System Error: Contract Not Found", true);
-      return; // Stops the rest of the script from crashing
+    // 3. Security Check
+    if (!VAULT_ADDR || !ethers.utils.isAddress(VAULT_ADDR)) {
+      updateStatus("API Error: Contract Address not found in Vercel.", true);
+      return; // STOP THE APP
+    }
+
+    // 4. Success! Unlock the Connect Button
+    updateStatus("Secure connection established. Ready.", false);
+    document.getElementById('connectBtn').classList.remove('disabled-btn');
+
+    // 5. Setup Button Listeners
+    document.getElementById('connectBtn').onclick = connectWallet;
+    document.getElementById('disconnectBtn').onclick = disconnectWallet;
+    document.getElementById('approveBtn').onclick = handleApprove;
+    document.getElementById('zapInBtn').onclick = handleZapIn;
+    document.getElementById('zapOutBtn').onclick = handleZapOut;
+    document.getElementById('copyRefBtn').onclick = copyReferral;
+
+    // 6. Auto-Connect if previously connected
+    if (window.ethereum && localStorage.getItem('isWalletConnected') === 'true') {
+      provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+      provider.listAccounts().then(accs => { if (accs.length > 0) setupSession(accs[0]); });
     }
 
   } catch (err) {
-    console.error("Failed to fetch config from Vercel API", err);
-    return;
-  }
-
-  // 2. ONLY proceed if the address was successfully loaded
-  document.getElementById('connectBtn').onclick = connectWallet;
-  document.getElementById('disconnectBtn').onclick = disconnectWallet;
-  document.getElementById('approveBtn').onclick = handleApprove;
-  document.getElementById('zapInBtn').onclick = handleZapIn;
-  document.getElementById('zapOutBtn').onclick = handleZapOut;
-  document.getElementById('copyRefBtn').onclick = copyReferral;
-
-  if (window.ethereum && localStorage.getItem('isWalletConnected') === 'true') {
-    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-    provider.listAccounts().then(accs => { if (accs.length > 0) setupSession(accs[0]); });
+    updateStatus("Critical Error: Vercel API Offline.", true);
   }
 };
 
-// ... keep the rest of your main.js exactly the same ...
-
-
 async function connectWallet(e) {
   if(e) e.preventDefault();
+  if(!VAULT_ADDR) return; // EXTRA LOCK
   try {
     await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: "0x2105" }] });
     const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -62,21 +67,19 @@ async function connectWallet(e) {
 async function setupSession(addr) {
   provider = new ethers.providers.Web3Provider(window.ethereum, "any");
   signer = provider.getSigner();
+  
+  // Create Contract instances
   vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
   usdc = new ethers.Contract(USDC_ADDR, U_ABI, signer);
 
   document.getElementById('connectBtn').classList.add('hidden');
   document.getElementById('disconnectBtn').classList.remove('hidden');
-  updateStatus("System Ready", false);
+  updateStatus("Wallet Connected.", false);
   refreshStats(addr);
 }
 
-// ✅ FIXED: Checks if the address is valid to prevent ENS/Lookup Errors
 async function refreshStats(addr) {
-  if (!addr || !ethers.utils.isAddress(addr)) {
-    console.error("Invalid address. Stopping query.");
-    return;
-  }
+  if (!addr || !ethers.utils.isAddress(addr)) return;
 
   try {
     const bal = await vault.getAccountValue(addr);
@@ -91,7 +94,6 @@ async function refreshStats(addr) {
     document.getElementById('profitDisplay').innerText = profit.toFixed(4);
     document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(refEarns, 6)).toFixed(4);
 
-    // ✅ BUTTON LOGIC: Unlocks "Zap Out" if user has money in the contract
     if (principal > 0) {
       document.getElementById('zapOutBtn').classList.remove('disabled-btn');
     } else {
@@ -124,17 +126,13 @@ async function handleApprove(e) {
     const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(val, 6));
     await tx.wait(); 
     updateStatus("Approved! Ready to Zap In.", false);
-    
-    // ✅ BUTTON LOGIC: Unlocks "Zap In" after successful approval
     document.getElementById('zapInBtn').classList.remove('disabled-btn'); 
-
   } catch (err) { updateStatus("Approval Failed", true); }
 }
 
 async function handleZapIn(e) {
   if(e) e.preventDefault();
   const val = document.getElementById('amountInput').value;
-  // ✅ FIXED: Enforces strictly valid 0x standard fallback address
   const ref = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
   try {
     updateStatus("Zapping In...", false);
@@ -173,4 +171,5 @@ function disconnectWallet(e) {
 function updateStatus(msg, isErr) {
   const s = document.getElementById('statusLabel');
   s.innerText = msg;
-  s.className = isErr ? "status-msg status-error" :
+  s.className = isErr ? "status-msg status-error" : "status-msg";
+}

@@ -1,7 +1,7 @@
 {
-  "build": {
-    "env": {
-      "CONTRACT_ADDRESS": "@contract_address"
+  "functions": {
+    "api/config.js": {
+      "runtime": "@vercel/node"
     }
   }
 }
