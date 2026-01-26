@@ -137,4 +137,4 @@ contract ZapYieldsMainnetLive is Ownable, ReentrancyGuard {
     function getDownlines(address _user) external view returns (address[] memory) {
         return referralList[_user];
     }
-}
+} 
