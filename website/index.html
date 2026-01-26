@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>ZapYield | Persistent & Manual Session</title>
+  <title>ZapYield | Persistent & Debugged</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/components.css" rel="stylesheet" type="text/css">
@@ -10,6 +10,8 @@
   <style>
     .hidden { display: none !important; }
     #disconnectBtn { background-color: #450a0a; color: #f87171; border: 1px solid #7f1d1d; margin-left: 10px; }
+    .status-active { color: #facc15; font-weight: bold; }
+    .status-error { color: #ef4444; font-weight: bold; }
   </style>
 </head>
 <body class="body-2">
@@ -38,7 +40,7 @@
                 <a href="#" id="approveBtn" class="button-3 w-button">1. Approve</a>
                 <a href="#" id="zapInBtn" class="zy-approve w-button">2. Zap In</a>
               </div>
-              <p id="statusLabel" style="font-size: 11px; margin-top: 15px; color: #facc15; text-align: center;">Initializing...</p>
+              <p id="statusLabel" class="status-active" style="font-size: 11px; margin-top: 15px; text-align: center;">Initializing...</p>
             </div>
           </div>
           <div class="zy-col1">
@@ -46,6 +48,7 @@
             <div class="ls-yb">
               <div class="zy-yb-text">Yield Balance: $<span id="yieldBalance">0.00</span></div>
             </div>
+            <p id="networkLabel" style="font-size: 10px; color: #666; margin-top: 5px;">Checking Network...</p>
           </div>
         </div>
       </div>
@@ -54,6 +57,9 @@
 
   <script>
     const VAULT_ADDR = "0x2392e90da0f0De5FD1Fa0978a244CcEE23b6CeF2";
+    const EXPECTED_CHAIN_ID = 84532; // Base Sepolia
+    const EXPECTED_CHAIN_HEX = "0x14a34";
+
     const V_ABI = ["function getAccountValue(address u) view returns (uint256)"];
 
     let signer, provider, vault;
@@ -65,53 +71,34 @@
       if (window.ethereum) {
         provider = new ethers.providers.Web3Provider(window.ethereum);
         
-        // Auto-connect ONLY if the user hasn't explicitly disconnected recently
-        const isDisconnected = localStorage.getItem('userDisconnected') === 'true';
+        // Listen for Network Changes
+        window.ethereum.on('chainChanged', () => window.location.reload());
         
+        const isDisconnected = localStorage.getItem('userDisconnected') === 'true';
         const accounts = await provider.listAccounts();
+        
         if (accounts.length > 0 && !isDisconnected) {
           setupWallet(accounts[0]);
         } else {
-          updateStatus("Wallet Disconnected");
+          updateStatus("Ready to Connect");
         }
-
-        window.ethereum.on('accountsChanged', (accounts) => {
-          if (accounts.length > 0) {
-            localStorage.removeItem('userDisconnected');
-            setupWallet(accounts[0]);
-          } else {
-            disconnect();
-          }
-        });
       }
     };
 
     async function connect() {
       if (!window.ethereum) return alert("MetaMask not found!");
       try {
+        const network = await provider.getNetwork();
+        if (network.chainId !== EXPECTED_CHAIN_ID) {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: EXPECTED_CHAIN_HEX }],
+          });
+        }
         const accounts = await provider.send("eth_requestAccounts", []);
-        localStorage.removeItem('userDisconnected'); // Clear disconnect flag
+        localStorage.removeItem('userDisconnected');
         setupWallet(accounts[0]);
-      } catch (err) { console.error(err); }
-    }
-
-    function disconnect(e) {
-      if(e) e.preventDefault();
-      
-      // 1. Set a flag so it doesn't auto-connect on refresh
-      localStorage.setItem('userDisconnected', 'true');
-      
-      // 2. Clear app state
-      signer = null;
-      vault = null;
-      
-      // 3. UI Reset
-      document.getElementById('connectBtn').innerText = "Connect Wallet";
-      document.getElementById('connectBtn').classList.remove('hidden');
-      document.getElementById('disconnectBtn').classList.add('hidden');
-      document.getElementById('welcomeText').innerText = "Welcome to ZapYields";
-      document.getElementById('yieldBalance').innerText = "0.00";
-      updateStatus("Wallet Disconnected");
+      } catch (err) { console.error(err); updateStatus("Connection Error", true); }
     }
 
     async function setupWallet(addr) {
@@ -119,20 +106,49 @@
       vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
       
       document.getElementById('connectBtn').innerText = addr.substring(0,6) + "...";
+      document.getElementById('connectBtn').classList.add('hidden');
       document.getElementById('disconnectBtn').classList.remove('hidden');
       document.getElementById('welcomeText').innerText = "Wallet Active";
+      document.getElementById('networkLabel').innerText = "Network: Base Sepolia";
       updateStatus("Session Active");
       refresh(addr);
     }
 
     async function refresh(addr) {
+      if (!vault) return;
       try {
+        // Validation: Verify network again before calling contract
+        const { chainId } = await provider.getNetwork();
+        if (chainId !== EXPECTED_CHAIN_ID) {
+            updateStatus("Wrong Network!", true);
+            return;
+        }
+
         const bal = await vault.getAccountValue(addr);
         document.getElementById('yieldBalance').innerText = ethers.utils.formatUnits(bal, 6);
-      } catch (e) { console.error("Refresh error", e); }
+      } catch (e) { 
+        console.error("Refresh error", e); 
+        updateStatus("Vault Read Error (Check Network)", true);
+      }
     }
 
-    function updateStatus(msg) { document.getElementById('statusLabel').innerText = msg; }
+    function disconnect(e) {
+      if(e) e.preventDefault();
+      localStorage.setItem('userDisconnected', 'true');
+      signer = null; vault = null;
+      document.getElementById('connectBtn').innerText = "Connect Wallet";
+      document.getElementById('connectBtn').classList.remove('hidden');
+      document.getElementById('disconnectBtn').classList.add('hidden');
+      document.getElementById('yieldBalance').innerText = "0.00";
+      document.getElementById('networkLabel').innerText = "Checking Network...";
+      updateStatus("Disconnected");
+    }
+
+    function updateStatus(msg, isError = false) { 
+      const label = document.getElementById('statusLabel');
+      label.innerText = msg;
+      label.className = isError ? "status-error" : "status-active";
+    }
   </script>
 </body>
 </html>
