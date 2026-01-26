@@ -1,4 +1,4 @@
-const VAULT_ADDR = "0x9501CB9649c5A7529a5d6DEDbE3Bce07d0DEec95"; 
+const VAULT_ADDR = "0x671e4f904e07a392785e031c2b0b127329eb4506"; 
 const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 // Updated ABI: Includes Tier Logic & Event Emitters
