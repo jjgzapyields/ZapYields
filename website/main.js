@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 
 // --- CONFIGURATION ---
 // In Vite, you can use import.meta.env to read from your .env file
-const VAULT_ADDR = "0x9501CB9649c5A7529a5d6DEDbE3Bce07d0DEec95"; // Or import.meta.env.VITE_VAULT_ADDR
+const VAULT_ADDR = window.ENV_VAULT_ADDR;
 const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 const V_ABI = [
