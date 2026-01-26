@@ -1,5 +1,7 @@
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "build": {
+    "env": {
+      "CONTRACT_ADDRESS": "@contract_address"
+    }
+  }
 }

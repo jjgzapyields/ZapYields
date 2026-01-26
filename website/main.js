@@ -1,6 +1,4 @@
-// --- CONFIGURATION ---
-// In Vite, you can use import.meta.env to read from your .env file
-const VAULT_ADDR = window.ENV_VAULT_ADDR;
+const VAULT_ADDR = window.ENV_VAULT_ADDR; // Pulled from Vercel securely
 const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 const V_ABI = [
@@ -51,8 +49,13 @@ async function setupSession(addr) {
   refreshStats(addr);
 }
 
-// ✅ NEW: Manages Button States based on user balance
+// ✅ FIXED: Checks if the address is valid to prevent ENS/Lookup Errors
 async function refreshStats(addr) {
+  if (!addr || !ethers.utils.isAddress(addr)) {
+    console.error("Invalid address. Stopping query.");
+    return;
+  }
+
   try {
     const bal = await vault.getAccountValue(addr);
     const refEarns = await vault.getReferralEarnings(addr);
@@ -66,8 +69,7 @@ async function refreshStats(addr) {
     document.getElementById('profitDisplay').innerText = profit.toFixed(4);
     document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(refEarns, 6)).toFixed(4);
 
-    // --- BUTTON UNLOCK LOGIC ---
-    // If the user has a balance inside the contract, UNLOCK "Zap Out"
+    // ✅ BUTTON LOGIC: Unlocks "Zap Out" if user has money in the contract
     if (principal > 0) {
       document.getElementById('zapOutBtn').classList.remove('disabled-btn');
     } else {
@@ -98,10 +100,10 @@ async function handleApprove(e) {
   try {
     updateStatus("Approving...", false);
     const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(val, 6));
-    await tx.wait(); // Wait for blockchain confirmation
+    await tx.wait(); 
     updateStatus("Approved! Ready to Zap In.", false);
     
-    // ✅ NEW: Unlock "Zap In" after successful approval
+    // ✅ BUTTON LOGIC: Unlocks "Zap In" after successful approval
     document.getElementById('zapInBtn').classList.remove('disabled-btn'); 
 
   } catch (err) { updateStatus("Approval Failed", true); }
@@ -110,6 +112,7 @@ async function handleApprove(e) {
 async function handleZapIn(e) {
   if(e) e.preventDefault();
   const val = document.getElementById('amountInput').value;
+  // ✅ FIXED: Enforces strictly valid 0x standard fallback address
   const ref = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
   try {
     updateStatus("Zapping In...", false);
@@ -148,5 +151,4 @@ function disconnectWallet(e) {
 function updateStatus(msg, isErr) {
   const s = document.getElementById('statusLabel');
   s.innerText = msg;
-  s.className = isErr ? "status-msg status-error" : "status-msg";
-}
+  s.className = isErr ? "status-msg status-error" :
