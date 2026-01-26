@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ZapApy V2 Pro | Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #18181b;
+      --text: #e4e4e7;
+      --subtext: #a1a1aa;
+      --primary: #10b981;
+      --accent: #3b82f6;
+      --border: #27272a;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 60px 20px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-size: 1.5rem;
+      color: #fff;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      margin-top: 40px;
+    }
+    h3 {
+      color: var(--primary);
+      margin-top: 25px;
+    }
+    p, ul {
+      color: var(--subtext);
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    .badges {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    .badge {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .b-blue { color: #60a5fa; border-color: #1e3a8a; background: #172554; }
+    .b-green { color: #34d399; border-color: #065f46; background: #064e3b; }
+    
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    strong {
+      color: #fff;
+    }
+    code {
+      background: #27272a;
+      color: #facc15;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      color: var(--subtext);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+<div style="background: #09090b; border-bottom: 1px solid #27272a; padding: 15px 20px;">
+    <div style="max-width: 800px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+      <div style="font-size: 20px; font-weight: 800; color: #fff;">ZapApy⚡ <span style="font-size: 10px; color: #10b981;">V2 PRO</span></div>
+      <nav style="display: flex; gap: 20px;">
+        <a href="index.html" style="color: #a1a1aa; text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">App</a>
+        <a href="docs.html" style="color: #fff; text-decoration: none; font-size: 14px; font-weight: 600;">Docs</a>
+      </nav>
+    </div>
+  </div>
+  <div class="container">
+    <h1>⚡ ZapApy V2 Pro</h1>
+    <p style="font-size: 1.2rem; color: #fff;">The Zero-Loss Yield Aggregator on Base Network.</p>
+
+    <div class="badges">
+      <span class="badge b-blue">v2.0_Pro</span>
+      <span class="badge b-blue">Base_Mainnet</span>
+      <span class="badge b-green">Status: Live</span>
+    </div>
+
+    <h2>📖 Introduction</h2>
+    <p><strong>ZapApy</strong> is a decentralized, institutional-grade yield aggregator built on the Base Network. It enables users to deposit standard USDC and instantly access the $100M+ Moonwell MetaMorpho lending market.</p>
+    <p>ZapApy is designed around a <strong>Zero-Loss Principal</strong> philosophy: User deposits are 100% protected. Platform fees and referral payouts are deducted <em>exclusively</em> from generated profits, never from the user's initial capital.</p>
+
+    <h2>⚙️ How It Works (The Vault)</h2>
+    <p>The ZapApy Smart Contract handles all financial operations automatically without human intervention.</p>
+
+    <div class="card">
+      <h3>1. Zap In (Deposit)</h3>
+      <ul>
+        <li><strong>Minimum Deposit:</strong> 10.00 USDC.</li>
+        <li><strong>Action:</strong> User funds are instantly routed into the Moonwell MetaMorpho Vault, beginning to earn ~9.1% APY immediately.</li>
+        <li><strong>Loyalty Lock:</strong> A 76-hour lock timer begins at the exact moment of deposit.</li>
+        <li><strong>Referral Link:</strong> If a user zaps in using a referral link (<code>?ref=0x...</code>), that referrer is permanently linked to the user on the blockchain.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>2. Zap Out (Withdrawal)</h3>
+      <p>The system calculates payouts based on the <strong>76-Hour Loyalty Lock</strong>:</p>
+      <ul>
+        <li><strong>Early Exit (Before 76 Hours):</strong> A 1% penalty is applied to the total value to prevent flash-farming bots. 99% of the funds are returned to the user.</li>
+        <li><strong>Standard Exit (After 76 Hours):</strong> <strong>100% of the Initial Principal</strong> is returned to the user. The generated profit is split three ways:
+          <ul>
+            <li><strong>85%</strong> to the User.</li>
+            <li><strong>10%</strong> to the Referrer (paid instantly).</li>
+            <li><strong>5%</strong> to the Protocol Treasury (for sustainability).</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <h2>🖥️ User Experience (The DApp)</h2>
+    <p>The frontend is built using secure, dependency-free Vanilla JavaScript, ensuring maximum uptime and zero package vulnerabilities.</p>
+    <ul>
+      <li><strong>Optimistic Yield Ticker:</strong> The dashboard calculates micro-yields and updates the user's balance every 50 milliseconds, bypassing slow blockchain read times.</li>
+      <li><strong>Per-Second Earnings:</strong> Displays the exact dollar amount earned every second (e.g., <em>+$0.00000008/sec</em>).</li>
+      <li><strong>1-Click Referral System:</strong> Users can generate and copy their unique pay link directly from the dashboard to start earning their 10% downline commission.</li>
+    </ul>
+
+    <h2>🔒 Security & Sustainability</h2>
+    <ul>
+      <li><strong>Un-ruggable:</strong> The contract contains no functions that allow the owner or admin to pause the contract, lock user funds, or withdraw user deposits.</li>
+      <li><strong>Anti-Flash-Farming:</strong> The 76-hour lock prevents sophisticated bots from exploiting the vault for quick gains, protecting the yield generation for long-term users.</li>
+      <li><strong>Self-Sustaining Revenue:</strong> The Protocol Treasury earns 5% of all yield generated on the platform (plus early-exit penalties), creating a sustainable business model without ever taxing the users' initial capital.</li>
+    </ul>
+
+    <div class="footer">
+      © 2026 ZapApy Protocol. All smart contracts interact directly with the Base Blockchain.
+    </div>
+  </div>
+
+</body>
+</html>
