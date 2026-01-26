@@ -1,102 +1,206 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-wf-page="6976bad4554906b552056036" data-wf-site="68e9a4589764b573e2afecc9" lang="en">
 <head>
   <meta charset="utf-8">
-  <title>ZapYield | Mainnet Live</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+  <title>ZapYields | Mainnet Alpha</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
+  <link href="css/components.css" rel="stylesheet" type="text/css">
   <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+  
+  <style>
+    .hidden { display: none !important; }
+    #statusLabel { font-weight: bold; padding: 10px; border-radius: 5px; margin-top: 10px; }
+    .status-neutral { color: #facc15; }
+    .status-error { color: #ff4444; background: rgba(255,0,0,0.1); }
+    input::placeholder { color: rgba(255,255,255,0.4); }
+  </style>
 </head>
 <body class="body-2">
   <div class="zy-header">
     <div class="zy-inner">
-      <div class="zy-logo">ZapYields⚡ <span style="font-size: 10px; color: #facc15;">MAINNET</span></div>
+      <a href="#" class="zy-logo w-inline-block">
+        <div class="text-block-31">ZapYields</div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 25" fill="none">
+          <path d="M8.50001 23.968C8.20001 23.968 7.90001 23.868 7.60001 23.768C6.80001 23.368 6.40001 22.568 6.60001 21.768L7.80001 15.968H6.00001C5.20001 15.968 4.50001 15.468 4.20001 14.768C3.90001 14.068 4.00001 13.268 4.60001 12.768L14.1 2.66801C14.7 2.06801 15.7 1.86801 16.4 2.26801C17.2 2.66801 17.6 3.46801 17.4 4.26801L16.2 10.068H18C18.8 10.068 19.5 10.568 19.8 11.268C20.1 11.968 20 12.768 19.4 13.268L9.90001 23.368C9.50001 23.768 9.00001 23.968 8.50001 23.968Z" fill="#facc15"></path>
+        </svg>
+      </a>
       <div class="header-btns">
         <a href="#" id="connectBtn" class="zy-connect-wallet w-button">Connect Wallet</a>
-        <a href="#" id="disconnectBtn" class="w-button" style="display:none; background:#450a0a;">Disconnect</a>
+        <a href="#" id="disconnectBtn" class="w-button hidden" style="background: #450a0a; margin-left:10px;">Disconnect</a>
       </div>
     </div>
   </div>
 
   <div class="zy-main-container">
-    <div class="zmp-inner">
-      <div class="zy-col1">
-        <input type="number" id="amountInput" placeholder="Min 10 USDC" class="input-field" style="color:black;">
-        <button id="approveBtn" class="button-3 w-button">1. Approve</button>
-        <button id="zapInBtn" class="zy-approve w-button">2. Zap In</button>
-        <p id="statusLabel" style="color:#facc15; text-align:center; margin-top:10px;">Connect to Base Mainnet</p>
-      </div>
-      <div class="ls-yb">
-        <div>Live Vault Value: <strong id="yieldDisplay">$0.00</strong></div>
+    <div class="zy-main-app">
+      <div class="zmp-inner">
+        <h1 class="zy-h1">Mainnet Dashboard</h1>
+        <div class="zy-2-cols">
+          <div class="zy-col1">
+            <h2 class="heading-9">Investment Panel</h2>
+            <div class="div-block-89">
+              <div class="amount">
+                <div class="amount-label">USDC Amount</div>
+                <input placeholder="Min 10.00" type="number" id="amountInput" class="input-field" style="color: white !important; background: rgba(0,0,0,0.3);">
+              </div>
+              <div class="zy-btns">
+                <a href="#" id="approveBtn" class="button-3 w-button">1. Approve USDC</a>
+                <a href="#" id="zapInBtn" class="zy-approve w-button">2. Zap Into Vault</a>
+                <a href="#" id="zapOutBtn" class="red-btn w-button" style="margin-top:10px; background:#5a0000;">Zap Out All</a>
+              </div>
+              <p id="statusLabel" class="status-neutral" style="text-align: center; font-size: 11px;">Ready for Connection</p>
+            </div>
+          </div>
+
+          <div class="zy-col1">
+            <h2 class="heading-9">Portfolio Stats</h2>
+            <div class="ls-yb">
+              <div class="zy-yb-text">Yield Balance</div>
+              <div class="yb-amt-wrap">
+                <div class="zy-yb-cur">$</div>
+                <div class="zy-yb-amt" id="yieldDisplay">0.00</div>
+              </div>
+            </div>
+            
+            <div class="ls-yb" style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
+              <div class="zy-yb-text">Your Referral Link</div>
+              <div class="yb-amt-wrap">
+                <a href="#" id="copyRefBtn" class="ref-btn w-button">Copy Link</a>
+              </div>
+              <div id="downlineList" style="font-size: 10px; color: #888; margin-top: 10px;">Downlines will appear here.</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
     const MAINNET_CHAIN_ID = 8453;
-    const MAINNET_CHAIN_HEX = "0x2105";
-    const VAULT_ADDR = "0x15f51f8106E9d647922495B6e1B1171fEFA8F50d";
+    const MAINNET_HEX = "0x2105";
+    // Replace with your Mainnet deployment address
+    const VAULT_ADDR = "0x15f51f8106E9d647922495B6e1B1171fEFA8F50d"; 
     const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
-    const V_ABI = ["function zapIn(uint256 a, address r) external", "function getAccountValue(address u) view returns (uint256)"];
-    const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
+    const V_ABI = [
+      "function zapIn(uint256 a, address r) external",
+      "function zapOut() external",
+      "function getAccountValue(address u) view returns (uint256)",
+      "function getDownlines(address u) view returns (address[] memory)"
+    ];
+    const U_ABI = ["function approve(address s, uint256 a) public returns (bool)", "function balanceOf(address a) view returns (uint256)"];
 
     let signer, provider, vault, usdc;
 
     window.onload = async () => {
       if (window.ethereum) {
         provider = new ethers.providers.Web3Provider(window.ethereum);
+        window.ethereum.on('accountsChanged', () => window.location.reload());
         window.ethereum.on('chainChanged', () => window.location.reload());
         
         const accounts = await provider.listAccounts();
-        if (accounts.length > 0) setup(accounts[0]);
+        if (accounts.length > 0 && localStorage.getItem('connected') === 'true') {
+          init(accounts[0]);
+        }
       }
       document.getElementById('connectBtn').onclick = connect;
+      document.getElementById('disconnectBtn').onclick = disconnect;
+      document.getElementById('approveBtn').onclick = handleApprove;
+      document.getElementById('zapInBtn').onclick = handleZapIn;
+      document.getElementById('zapOutBtn').onclick = handleZapOut;
+      document.getElementById('copyRefBtn').onclick = copyRef;
     };
 
     async function connect() {
       try {
-        // Request Network Switch to Mainnet
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: MAINNET_CHAIN_HEX }],
+          params: [{ chainId: MAINNET_HEX }],
         });
-        const accounts = await provider.send("eth_requestAccounts", []);
-        setup(accounts[0]);
-      } catch (err) {
-        if (err.code === 4902) alert("Please add Base Mainnet to MetaMask");
-        console.error(err);
-      }
+        const accs = await provider.send("eth_requestAccounts", []);
+        localStorage.setItem('connected', 'true');
+        init(accs[0]);
+      } catch (e) { console.error(e); }
     }
 
-    async function setup(addr) {
+    async function init(addr) {
       const { chainId } = await provider.getNetwork();
-      if (chainId !== MAINNET_CHAIN_ID) return updateStatus("Wrong Network - Switch to Base", true);
+      if (chainId !== MAINNET_CHAIN_ID) return updateStatus("Please switch to Base Mainnet", true);
 
       signer = provider.getSigner();
       vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
       usdc = new ethers.Contract(USDC_ADDR, U_ABI, signer);
 
-      document.getElementById('connectBtn').innerText = addr.substring(0,6) + "...";
-      updateStatus("Connected to Mainnet");
+      document.getElementById('connectBtn').classList.add('hidden');
+      document.getElementById('disconnectBtn').classList.remove('hidden');
+      updateStatus("Wallet: " + addr.substring(0, 6) + "...");
       refresh(addr);
+    }
+
+    async function handleApprove() {
+      const val = document.getElementById('amountInput').value;
+      if (val < 10) return updateStatus("Min 10 USDC Required", true);
+      try {
+        updateStatus("Confirming Approval...");
+        const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(val, 6));
+        await tx.wait();
+        updateStatus("Approved! Ready to Zap.");
+      } catch (e) { updateStatus("Approval Failed", true); }
+    }
+
+    async function handleZapIn() {
+      const val = document.getElementById('amountInput').value;
+      const ref = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
+      try {
+        updateStatus("Zapping into Vault...");
+        const tx = await vault.zapIn(ethers.utils.parseUnits(val, 6), ref);
+        await tx.wait();
+        updateStatus("Zap Success!");
+        refresh(await signer.getAddress());
+      } catch (e) { updateStatus("Zap Failed - Check Min $10", true); }
+    }
+
+    async function handleZapOut() {
+      try {
+        updateStatus("Withdrawing All...");
+        const tx = await vault.zapOut();
+        await tx.wait();
+        updateStatus("Withdrawal Success!");
+        refresh(await signer.getAddress());
+      } catch (e) { updateStatus("Withdraw Failed", true); }
     }
 
     async function refresh(addr) {
       try {
         const bal = await vault.getAccountValue(addr);
-        document.getElementById('yieldDisplay').innerText = "$" + ethers.utils.formatUnits(bal, 6);
-      } catch (err) { console.error(err); }
+        document.getElementById('yieldDisplay').innerText = ethers.utils.formatUnits(bal, 6);
+        const team = await vault.getDownlines(addr);
+        if(team.length > 0) document.getElementById('downlineList').innerText = team.length + " Referrals";
+      } catch (e) { console.error("Balance Error:", e); }
     }
 
-    async function handleApprove() {
-        const val = document.getElementById('amountInput').value;
-        const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(val, 6));
-        await tx.wait();
-        updateStatus("Approved!");
+    function disconnect() {
+      localStorage.setItem('connected', 'false');
+      window.location.reload();
     }
 
-    function updateStatus(msg) { document.getElementById('statusLabel').innerText = msg; }
+    function copyRef() {
+      signer.getAddress().then(a => {
+        const link = window.location.origin + window.location.pathname + "?ref=" + a;
+        navigator.clipboard.writeText(link);
+        alert("Referral Link Copied!");
+      });
+    }
+
+    function updateStatus(m, err=false) {
+      const s = document.getElementById('statusLabel');
+      s.innerText = m;
+      s.className = err ? "status-error" : "status-neutral";
+    }
   </script>
 </body>
 </html>
