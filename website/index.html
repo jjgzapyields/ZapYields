@@ -8,75 +8,23 @@
   <link href="css/components.css" rel="stylesheet" type="text/css">
   <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-  
+  <meta name="base:app_id" content="697829d088e3bac59cf3daa2" />
   <style>
-    /* 1. Main Container with 30px Padding */
-    .zy-main-container { 
-      padding: 30px; 
-      max-width: 1200px; 
-      margin: 0 auto; 
-    }
-
-    /* 2. New Class for Centered Yield Subtext */
-    .zy-subtext-highlight {
-      color: #a1a1aa;
-      margin-bottom: 40px;
-      text-align: center; /* Center-aligned text */
-      font-size: 16px;
-      line-height: 1.6;
-    }
-
-    /* 3. Mobile Responsive Header */
-    .zy-header { 
-      background: rgba(9, 9, 11, 0.8); 
-      backdrop-filter: blur(10px); 
-      border-bottom: 1px solid #27272a; 
-      padding: 15px 0;
-      width: 100%;
-    }
+    .zy-main-container { padding: 30px; max-width: 1200px; margin: 0 auto; }
+    .zy-subtext-highlight { color: #a1a1aa; margin-bottom: 40px; text-align: center; font-size: 16px; line-height: 1.6; }
+    .zy-header { background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #27272a; padding: 15px 0; width: 100%; }
+    .zy-inner { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding: 0 20px; flex-wrap: wrap; gap: 15px; }
+    .header-left { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
     
-    .zy-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-      flex-wrap: wrap; /* Allows wrapping on small screens */
-      gap: 15px;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    /* Media Query for Mobile Header Adjustment */
     @media (max-width: 768px) {
-      .zy-inner {
-        flex-direction: column; /* Stack logo and buttons vertically */
-        text-align: center;
-      }
-      .header-left {
-        flex-direction: row;
-        gap: 10px;
-	justify-content: center;
-      }
+      .zy-inner { flex-direction: column; text-align: center; }
+      .header-left { flex-direction: row; gap: 10px; justify-content: center; }
       .zy-h1 { font-size: 24px; text-align: center; }
-      .zy-2-cols { flex-direction: column; }
+      .zy-2-cols { flex-direction: column; gap: 20px; }
     }
 
-    /* Base UI Polish */
     body { background-color: #09090b; color: #e4e4e7; font-family: 'Inter', sans-serif; margin: 0; }
-    .glass-card {
-      background: rgba(24, 24, 27, 0.6);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px; padding: 25px;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-    }
+    .glass-card { background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 25px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
     .hidden { display: none !important; }
     .status-msg { font-size: 11px; margin-top: 15px; text-align: center; color: #10b981; font-weight: bold; }
     .status-error { color: #ff6b6b !important; }
@@ -84,6 +32,7 @@
     .stat-val { color: #fff; font-weight: 600; }
     .per-second { color: #3b82f6; font-size: 11px; font-weight: bold; margin-top: 5px; text-align: right; }
     .ref-count-badge { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid #10b981; padding: 4px 10px; border-radius: 20px; font-size: 11px; }
+    .apy-badge { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 800; }
     .disabled-btn { opacity: 0.3 !important; pointer-events: none !important; background: #52525b !important; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
   </style>
@@ -93,12 +42,10 @@
     <div class="zy-inner">
       <div class="header-left">
         <div class="zy-logo">ZapApy⚡ <span style="font-size: 10px; color: #10b981;">V2 PRO</span></div>
-        
         <div id="networkStatus" style="display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.3);">
           <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: pulse 2s infinite;"></div>
           <span style="font-size: 11px; font-weight: 700; color: #10b981;">BASE MAINNET</span>
         </div>
-
         <nav style="display: flex; gap: 15px;">
           <a href="index.html" style="color: #fff; text-decoration: none; font-size: 14px; font-weight: 600;">App</a>
           <a href="docs.html" style="color: #a1a1aa; text-decoration: none; font-size: 14px;">Docs</a>
@@ -121,7 +68,7 @@
           <h2 class="heading-9">Deposit USDC</h2>
           <input placeholder="Min 10.00 USDC" type="number" id="amountInput" class="input-field" style="color: white; background: #09090b; border: 1px solid #3f3f46; width: 100%; padding: 12px; border-radius: 8px; box-sizing: border-box;">
           <div style="margin-top: 20px; display: flex; flex-direction: row; gap: 10px; flex-wrap: wrap">
-            <a href="#" id="approveBtn" class="button-3 w-button">1. Approve USDC</a>
+            <a href="#" id="approveBtn" class="button-3 w-button">1. Approve</a>
             <a href="#" id="zapInBtn" class="zy-approve w-button disabled-btn">2. Zap In</a>
             <a href="#" id="zapOutBtn" class="red-btn w-button disabled-btn" style="background: #7f1d1d;">Zap Out & Claim</a>
           </div>
@@ -129,11 +76,16 @@
         </div>
 
         <div class="zy-col1 glass-card" style="flex: 1;">
-          <h2 class="heading-9">Live Portfolio</h2>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #27272a; padding-bottom: 10px;">
+            <h2 class="heading-9" style="margin: 0; border: none;">Live Portfolio</h2>
+            <div class="apy-badge"><span id="apyDisplay">4.14</span>% APY</div>
+          </div>
+          
           <div class="yb-amt-wrap">
             <div class="zy-yb-cur">$</div>
             <div class="zy-yb-amt" id="yieldDisplay">0.00</div>
           </div>
+          
           <div class="pro-stat"><span>Principal:</span> <span class="stat-val">$<span id="principalDisplay">0.00</span></span></div>
           <div class="per-second">+$<span id="perSecondDisplay">0.000000</span> / sec</div>
           
