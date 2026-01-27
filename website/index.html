@@ -60,8 +60,9 @@
         text-align: center;
       }
       .header-left {
-        flex-direction: column;
+        flex-direction: row;
         gap: 10px;
+	justify-content: center;
       }
       .zy-h1 { font-size: 24px; text-align: center; }
       .zy-2-cols { flex-direction: column; }
@@ -112,14 +113,14 @@
 
   <div class="zy-main-container">
     <div class="zmp-inner">
-      <h1 class="zy-h1" style="text-align: center;">Earn While You Sleep. Multiply Income When You Share.</h1>
+      <h1 class="zy-h1" style="text-align: center;">Earn While You Sleep. <br/>Multiply Income When You Share.</h1>
       <p class="zy-subtext-highlight">Get auto-compounding Base yields and unlock up to 80% commission on your network's profit.</p>
       
       <div class="zy-2-cols" style="display: flex; gap: 20px;">
         <div class="zy-col1 glass-card" style="flex: 1;">
           <h2 class="heading-9">Deposit USDC</h2>
           <input placeholder="Min 10.00 USDC" type="number" id="amountInput" class="input-field" style="color: white; background: #09090b; border: 1px solid #3f3f46; width: 100%; padding: 12px; border-radius: 8px; box-sizing: border-box;">
-          <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="margin-top: 20px; display: flex; flex-direction: row; gap: 10px; flex-wrap: wrap">
             <a href="#" id="approveBtn" class="button-3 w-button">1. Approve USDC</a>
             <a href="#" id="zapInBtn" class="zy-approve w-button disabled-btn">2. Zap In</a>
             <a href="#" id="zapOutBtn" class="red-btn w-button disabled-btn" style="background: #7f1d1d;">Zap Out & Claim</a>
