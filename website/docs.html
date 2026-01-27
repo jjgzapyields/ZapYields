@@ -12,49 +12,42 @@
     * { box-sizing: border-box; }
     body { background-color: #09090b; color: #e4e4e7; font-family: 'Inter', sans-serif; margin: 0; line-height: 1.6; }
     
-    /* Non-Sticky Header */
     .zy-header { background: rgba(9, 9, 11, 0.8); border-bottom: 1px solid #27272a; padding: 15px 0; width: 100%; position: relative; }
     .zy-inner { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-    
-    /* Layout Foundation */
     .docs-wrapper { display: flex; max-width: 1200px; margin: 0 auto; width: 100%; padding: 0 20px; }
-    
-    /* Sidebar (Desktop Only) */
     .toc-sidebar { display: none; }
 
-    /* Main Container */
     .zy-main-container { padding: 40px 0; flex: 1; text-align: left; width: 100%; }
-    
-    h1 { font-size: 32px; color: #fff; margin-bottom: 10px; scroll-margin-top: 40px; }
-    h2 { margin-top: 60px; color: #fff; font-size: 24px; border-bottom: 1px solid #27272a; padding-bottom: 15px; scroll-margin-top: 40px; }
-    h3 { color: #fff; margin-top: 30px; scroll-margin-top: 40px; }
-    p { color: #a1a1aa; margin-bottom: 25px; }
+    h1 { font-size: 28px; color: #fff; margin-bottom: 10px; scroll-margin-top: 40px; text-align: center; }
+    h2 { margin-top: 50px; color: #fff; font-size: 22px; border-bottom: 1px solid #27272a; padding-bottom: 15px; scroll-margin-top: 40px; }
+    h3 { color: #fff; margin-top: 30px; font-size: 18px; }
+    p { color: #a1a1aa; margin-bottom: 25px; font-size: 15px; }
 
-    /* The Tiers Grid */
-    .tier-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin: 40px 0; }
-    .tier-card { 
-      background: rgba(24, 24, 27, 0.6); 
-      backdrop-filter: blur(12px); 
-      border: 1px solid rgba(255, 255, 255, 0.08); 
-      border-radius: 16px; 
-      padding: 25px; 
-      text-align: center; 
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-    }
-    .tier-name { font-weight: 700; font-size: 14px; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
-    .tier-rate { font-size: 28px; color: #10b981; font-weight: 800; display: block; margin: 5px 0; }
-    .tier-req { font-size: 12px; color: #71717a; font-weight: 600; }
+    /* Tier Grid */
+    .tier-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin: 30px 0; }
+    .tier-card { background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 25px; text-align: center; }
+    .tier-name { font-weight: 700; font-size: 14px; color: #fff; text-transform: uppercase; }
+    .tier-rate { font-size: 28px; color: #10b981; font-weight: 800; display: block; }
+    .tier-req { font-size: 12px; color: #71717a; }
 
-    /* Content Styling */
-    .docs-content-block { background: rgba(24, 24, 27, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); padding: 30px; border-radius: 16px; margin-top: 20px; }
-    pre { background: #18181b; padding: 15px; border-radius: 8px; overflow-x: auto; border: 1px solid #27272a; font-size: 13px; color: #3b82f6; }
+    /* Technical Data Grid - Fix for Mobile */
+    .tech-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+    .tech-item { background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 8px; border: 1px solid #27272a; }
+    .tech-label { font-size: 11px; text-transform: uppercase; color: #71717a; font-weight: bold; display: block; margin-bottom: 4px; }
+    .tech-value { font-size: 14px; color: #e4e4e7; word-break: break-all; font-family: monospace; }
+
+    /* Installation Block - Fix for Mobile Overflow */
+    .docs-content-block { background: rgba(24, 24, 27, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); padding: 25px; border-radius: 16px; margin-top: 20px; }
+    pre { background: #18181b; padding: 15px; border-radius: 8px; overflow-x: auto; border: 1px solid #27272a; font-size: 13px; color: #3b82f6; white-space: pre-wrap; word-break: break-all; }
     code { color: #3b82f6; font-family: monospace; }
 
     @media (min-width: 768px) {
+      h1 { text-align: left; font-size: 32px; }
       .toc-sidebar { display: block; width: 250px; position: sticky; top: 40px; padding: 40px 20px 0 0; align-self: flex-start; }
       .toc-link { display: block; color: #a1a1aa; text-decoration: none; font-size: 14px; margin-bottom: 12px; transition: 0.2s; }
       .toc-link:hover { color: #3b82f6; }
       .tier-grid { grid-template-columns: repeat(5, 1fr); }
+      .tech-grid { grid-template-columns: 1fr 1fr; }
       .zy-main-container { padding: 40px 20px; }
     }
   </style>
@@ -87,9 +80,8 @@
       </section>
 
       <section id="tiers">
-        <h2 id="tiers-title">🌩️ The Power Tiers (Multiplied Income)</h2>
+        <h2>🌩️ Power Tiers (Multiplied Income)</h2>
         <p>Your referral commission rate is dynamically determined by your personal <strong>Principal</strong> deposit. The protocol automatically checks your tier status at the moment of a recruit's withdrawal to calculate your payout.</p>
-        
         <div class="tier-grid">
           <div class="tier-card"><span class="tier-name">Spark</span><span class="tier-rate">10%</span><span class="tier-req">$50+ USDC</span></div>
           <div class="tier-card"><span class="tier-name">Volt</span><span class="tier-rate">20%</span><span class="tier-req">$100+ USDC</span></div>
@@ -97,7 +89,7 @@
           <div class="tier-card"><span class="tier-name">Thunder</span><span class="tier-rate">50%</span><span class="tier-req">$1k+ USDC</span></div>
           <div class="tier-card"><span class="tier-name">Lightning</span><span class="tier-rate">80%</span><span class="tier-req">$5k+ USDC</span></div>
         </div>
-        <p style="text-align: center; font-size: 13px;"><em>*Default referral rate is 5% for deposits under $50 USDC.</em></p>
+        <p style="text-align: center; font-size: 12px; color: #71717a;">Default referral rate is 5% for deposits under $50 USDC.</p>
       </section>
 
       <section id="mechanics">
@@ -105,7 +97,6 @@
         <div class="docs-content-block">
           <h3>1. Zero-Loss Principal</h3>
           <p>User deposits are never taxed or deducted. All protocol fees and referral commissions are paid out <strong>strictly from generated profit</strong>. Users always retain 100% of their initial capital.</p>
-
           <h3>2. The 76-Hour Loyalty Lock</h3>
           <p>To ensure stable liquidity and prevent flash-loan manipulation:
             <ul style="margin-top: 10px;">
@@ -113,7 +104,6 @@
               <li><strong>Early Exit:</strong> Withdrawing before the 76-hour timer expires triggers a <strong>1% Early-Exit Penalty</strong> on the total balance.</li>
             </ul>
           </p>
-
           <h3>3. Dynamic APY rendering</h3>
           <p>The platform renders APY in real-time, reflecting live market utilization and incentive rewards provided by Moonwell. Yield is compounded every block.</p>
         </div>
@@ -121,13 +111,11 @@
 
       <section id="technicals">
         <h2>🖥️ Smart Contract Technicals</h2>
-        <div class="docs-content-block">
-          <ul style="list-style: none; padding: 0;">
-            <li style="margin-bottom: 10px;"><strong>Network:</strong> Base Mainnet (Chain ID: 8453)</li>
-            <li style="margin-bottom: 10px;"><strong>USDC Address:</strong> <code>0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</code></li>
-            <li style="margin-bottom: 10px;"><strong>Vault Provider:</strong> Moonwell MetaMorpho (mUSDC)</li>
-            <li><strong>Security:</strong> Built with OpenZeppelin <code>Ownable</code>, <code>ReentrancyGuard</code>, and <code>SafeERC20</code>.</li>
-          </ul>
+        <div class="tech-grid">
+          <div class="tech-item"><span class="tech-label">Network</span><span class="tech-value">Base Mainnet (Chain ID: 8453)</span></div>
+          <div class="tech-item"><span class="tech-label">USDC Address</span><span class="tech-value">0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</span></div>
+          <div class="tech-item"><span class="tech-label">Vault Provider</span><span class="tech-value">Moonwell MetaMorpho (mUSDC)</span></div>
+          <div class="tech-item"><span class="tech-label">Security</span><span class="tech-value">OpenZeppelin Ownable, ReentrancyGuard, SafeERC20</span></div>
         </div>
       </section>
 
@@ -136,7 +124,6 @@
         <div class="docs-content-block">
           <h3>Prerequisites</h3>
           <p>Node.js & npm, MetaMask (connected to Base Network), and a deployed instance of the <code>ZapApyV2Pro.sol</code> contract.</p>
-          
           <h3>Setup</h3>
           <p>Clone the repository:</p>
           <pre>git clone https://github.com/yourusername/zapapy-v2-pro.git</pre>
