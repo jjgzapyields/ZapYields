@@ -8,51 +8,58 @@
   <link href="css/components.css" rel="stylesheet" type="text/css">
   <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
   <style>
-    * { box-sizing: border-box; }
-    body { background-color: #09090b; color: #e4e4e7; font-family: 'Inter', sans-serif; margin: 0; line-height: 1.6; }
+    /* Smooth Scroll Activation */
+    html { scroll-behavior: smooth; }
     
-    .zy-header { background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #27272a; padding: 15px 0; position: sticky; top: 0; z-index: 100; }
+    * { box-sizing: border-box; }
+    body { background-color: #09090b; color: #e4e4e7; font-family: 'Inter', sans-serif; margin: 0; line-height: 1.6; display: flex; flex-direction: column; }
+    
+    /* Header - Non-Sticky Fix */
+    .zy-header { background: rgba(9, 9, 11, 0.8); border-bottom: 1px solid #27272a; padding: 15px 0; width: 100%; position: relative; }
     .zy-inner { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
     
-    .zy-main-container { padding: 40px 20px; max-width: 1000px; margin: 0 auto; text-align: center; }
-    h1 { font-size: 32px; color: #fff; margin-bottom: 10px; }
-    h2 { margin-top: 60px; color: #fff; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 10px; border-bottom: 1px solid #27272a; padding-bottom: 15px; }
+    /* Layout with Sidebar */
+    .docs-wrapper { display: flex; max-width: 1200px; margin: 0 auto; width: 100%; align-items: flex-start; }
+    
+    /* Table of Contents Sidebar */
+    .toc-sidebar { 
+      width: 250px; 
+      position: sticky; 
+      top: 40px; /* Sidebar stays sticky while scrolling content */
+      padding: 20px; 
+      text-align: left;
+      display: block;
+    }
+    .toc-sidebar h4 { font-size: 12px; text-transform: uppercase; color: #71717a; letter-spacing: 1px; margin-bottom: 15px; }
+    .toc-link { display: block; color: #a1a1aa; text-decoration: none; font-size: 14px; margin-bottom: 12px; transition: color 0.2s; }
+    .toc-link:hover { color: #3b82f6; }
+
+    .zy-main-container { padding: 40px 20px; flex: 1; text-align: center; }
+    
+    /* Scroll margin adjusted for non-sticky header */
+    h1 { font-size: 32px; color: #fff; margin-bottom: 10px; scroll-margin-top: 40px; }
+    h2 { margin-top: 60px; color: #fff; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 10px; border-bottom: 1px solid #27272a; padding-bottom: 15px; scroll-margin-top: 40px; }
+    h3 { color: #fff; margin-top: 30px; scroll-margin-top: 40px; }
     p { color: #a1a1aa; max-width: 750px; margin: 15px auto 30px; }
 
-    /* Referral Tiers Grid - ORIGINAL LOOK PRESERVED */
-    .tier-grid { 
-      display: grid; 
-      grid-template-columns: repeat(5, 1fr); 
-      gap: 15px; 
-      margin: 40px 0; 
-      width: 100%;
-    }
-
-    .tier-card { 
-      background: rgba(24, 24, 27, 0.6); 
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08); 
-      border-radius: 16px; 
-      padding: 25px 15px; 
-      text-align: center;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-    }
-
+    /* Referral Tiers Grid */
+    .tier-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin: 40px 0; width: 100%; }
+    .tier-card { background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 25px 15px; text-align: center; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
     .tier-name { font-weight: 700; font-size: 14px; color: #fff; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
     .tier-rate { font-size: 28px; color: #10b981; font-weight: 800; display: block; margin-bottom: 5px; }
     .tier-req { font-size: 12px; color: #71717a; font-weight: 600; }
 
-    /* RESPONSIVE STACKING LOGIC */
-    @media (max-width: 1024px) { .tier-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 768px) { .tier-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 480px) { .tier-grid { grid-template-columns: 1fr; } .tier-card { padding: 30px 20px; } }
+    .docs-content-block { text-align: left; max-width: 850px; margin: 0 auto; background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); padding: 30px; border-radius: 16px; margin-top: 20px; }
+    pre { background: #18181b; padding: 15px; border-radius: 8px; overflow-x: auto; border: 1px solid #27272a; color: #e4e4e7; text-align: left; font-size: 13px; }
 
-    .docs-content-block { text-align: left; max-width: 800px; margin: 0 auto; background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); padding: 30px; border-radius: 16px; margin-top: 20px; }
-    .highlight-box { background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); padding: 20px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #3b82f6; }
+    /* Responsive adjustments */
+    @media (max-width: 1024px) { .tier-grid { grid-template-columns: repeat(3, 1fr); } .toc-sidebar { display: none; } }
+    @media (max-width: 768px) { .tier-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .tier-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <div class="zy-header">
+  <header class="zy-header">
     <div class="zy-inner">
       <div class="zy-logo">ZapApy⚡ <span style="font-size: 10px; color: #10b981;">V2 PRO</span></div>
       <nav style="display: flex; gap: 20px;">
@@ -60,58 +67,80 @@
         <a href="docs.html" style="color: #fff; text-decoration: none; font-size: 14px; font-weight: 600;">Docs</a>
       </nav>
     </div>
-  </div>
+  </header>
 
-  <div class="zy-main-container">
-    <h1>Documentation</h1>
-    <p>The technical foundation of ZapApy V2 Pro yield automation.</p>
+  <div class="docs-wrapper">
+    <aside class="toc-sidebar">
+      <h4>Navigation</h4>
+      <a href="#overview" class="toc-link">📖 Overview</a>
+      <a href="#tiers" class="toc-link">🌩️ Power Tiers</a>
+      <a href="#mechanics" class="toc-link">⚙️ Core Mechanics</a>
+      <a href="#technicals" class="toc-link">🖥️ Technicals</a>
+      <a href="#installation" class="toc-link">🚀 Installation</a>
+    </aside>
 
-    <h2>🛡️ Fairness & Principal Guarantee</h2>
-    <div class="docs-content-block">
-      <h3 style="margin-top:0; color:#10b981;">Is the 80% Tier Unfair?</h3>
-      <p style="margin:0; text-align: left; color: #e4e4e7;">While high tiers can earn up to 80% commission, it is mathematically impossible for an upline to "take" a recruit's money. Here is why:</p>
-      
-      <div class="highlight-box">
-        <strong>The Principal Rule:</strong> Referral commissions are <u>only</u> calculated from <strong>Net Profit</strong> generated during the stay. Your initial deposit is 100% protected by the smart contract.
-      </div>
+    <main class="zy-main-container">
+      <section id="overview">
+        <h1>📖 Overview</h1>
+        <p>ZapApy V2 Pro is a decentralized yield aggregator built on the <strong>Base Network</strong>. It provides a simplified "Zap" interface into <strong>Moonwell MetaMorpho</strong> vaults. The protocol features a high-performance, 5-tier referral system designed to maximize community growth and reward high-capital depositors.</p>
+      </section>
 
-      <ul style="margin-top:20px; color: #e4e4e7;">
-        <li><strong>Capital Safety:</strong> If you deposit $1,000, you will always be able to withdraw your $1,000 (subject to the 76h lock).</li>
-        <li><strong>Profit Sharing:</strong> We only divide the <em>extra</em> money the vault earned for you.</li>
-        <li><strong>Protocol Incentive:</strong> The 80% rate rewards high-capital "Whales" for providing liquidity to the ecosystem.</li>
-      </ul>
-    </div>
+      <section id="tiers">
+        <h2>🌩️ The Power Tiers (Multiplied Income)</h2>
+        <p>Your referral commission rate is dynamically determined by your personal <strong>Principal</strong> deposit. The protocol automatically checks your tier status at the moment of a recruit's withdrawal to calculate your payout.</p>
 
-    <h2>💰 Earning From Referrals</h2>
-    <div class="docs-content-block">
-      <p style="margin:0; text-align: left; color: #e4e4e7;">ZapApy V2 Pro uses a <strong>Yield-Share Model</strong>. You earn a continuous percentage of the profits generated by your network.</p>
-      <ul style="margin-top:20px; color: #e4e4e7;">
-        <li><strong>Permanent Link:</strong> Users who Zap In via your link are tied to you forever.</li>
-        <li><strong>Yield Generation:</strong> Recruits earn interest in Moonwell MetaMorpho vaults.</li>
-        <li><strong>Instant Settlement:</strong> When they withdraw, your commission (10%-80%) is sent to you instantly.</li>
-      </ul>
-    </div>
+        <div class="tier-grid">
+          <div class="tier-card"><span class="tier-name">Spark</span><span class="tier-rate">10%</span><span class="tier-req">$50+ USDC</span></div>
+          <div class="tier-card"><span class="tier-name">Volt</span><span class="tier-rate">20%</span><span class="tier-req">$100+ USDC</span></div>
+          <div class="tier-card"><span class="tier-name">Surge</span><span class="tier-rate">30%</span><span class="tier-req">$200+ USDC</span></div>
+          <div class="tier-card"><span class="tier-name">Thunder</span><span class="tier-rate">50%</span><span class="tier-req">$1k+ USDC</span></div>
+          <div class="tier-card"><span class="tier-name">Lightning</span><span class="tier-rate">80%</span><span class="tier-req">$5k+ USDC</span></div>
+        </div>
+      </section>
 
-    <h2>🔮 Referral Power Tiers</h2>
-    <div class="tier-grid">
-      <div class="tier-card"><span class="tier-name">Spark</span><span class="tier-rate">10%</span><span class="tier-req">$50+ USDC</span></div>
-      <div class="tier-card"><span class="tier-name">Volt</span><span class="tier-rate">20%</span><span class="tier-req">$100+ USDC</span></div>
-      <div class="tier-card"><span class="tier-name">Surge</span><span class="tier-rate">30%</span><span class="tier-req">$200+ USDC</span></div>
-      <div class="tier-card"><span class="tier-name">Thunder</span><span class="tier-rate">50%</span><span class="tier-req">$1k+ USDC</span></div>
-      <div class="tier-card"><span class="tier-name">Lightning</span><span class="tier-rate">80%</span><span class="tier-req">$5k+ USDC</span></div>
-    </div>
+      <section id="mechanics">
+        <h2>⚙️ Core Protocol Mechanics</h2>
+        <div class="docs-content-block">
+          <h3>1. Zero-Loss Principal</h3>
+          <p>User deposits are never taxed or deducted. All protocol fees and referral commissions are paid out <strong>strictly from generated profit</strong>. Users always retain 100% of their initial capital.</p>
 
-    <h2>⚙️ Protocol Mechanics</h2>
-    <div class="docs-content-block">
-      <h3 style="margin-top:0; color:#fff;">76-Hour Loyalty Lock</h3>
-      <p style="margin:0; text-align:left; color:#e4e4e7;">To ensure stability, deposits have a 76-hour timer. 
-        <strong>Standard Exit:</strong> Full principal + profit share. 
-        <strong>Early Exit:</strong> 1% penalty on total balance.</p>
-    </div>
+          <h3>2. The 76-Hour Loyalty Lock</h3>
+          <p>To ensure stable liquidity and prevent flash-loan manipulation:
+            <ul>
+              <li><strong>Standard Exit:</strong> After 76 hours, users can withdraw 100% principal + profits.</li>
+              <li><strong>Early Exit:</strong> Withdrawing before the 76-hour timer expires triggers a 1% Early-Exit Penalty.</li>
+            </ul>
+          </p>
 
-    <footer style="margin-top: 80px; text-align: center; color: #52525b; font-size: 11px;">
-      ZapApy V2 Pro • 2026 • Verified on BaseScan
-    </footer>
+          <h3>3. Dynamic APY rendering</h3>
+          <p>The platform renders APY in real-time, reflecting live market utilization and incentives from Moonwell. Yield compounds every block.</p>
+        </div>
+      </section>
+
+      <section id="technicals">
+        <h2>🖥️ Smart Contract Technicals</h2>
+        <div class="docs-content-block">
+          <ul style="list-style: none; padding: 0;">
+            <li><strong>Network:</strong> Base Mainnet (Chain ID: 8453)</li>
+            <li><strong>USDC Address:</strong> <code>0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</code></li>
+            <li><strong>Vault Provider:</strong> Moonwell MetaMorpho (mUSDC)</li>
+            <li><strong>Security:</strong> Built with OpenZeppelin <code>Ownable</code>, <code>ReentrancyGuard</code>, and <code>SafeERC20</code>.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="installation">
+        <h2>🚀 Deployment & Installation</h2>
+        <div class="docs-content-block">
+          <p>Clone the repository and update the contract address in your <code>main.js</code> file.</p>
+          <pre>git clone https://github.com/yourusername/zapapy-v2-pro.git</pre>
+        </div>
+      </section>
+
+      <footer style="margin-top: 80px; text-align: center; color: #52525b; font-size: 11px;">
+        ZapApy V2 Pro • 2026 • Verified on BaseScan
+      </footer>
+    </main>
   </div>
 </body>
 </html>
