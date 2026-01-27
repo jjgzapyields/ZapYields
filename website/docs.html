@@ -10,39 +10,45 @@
   <style>
     * { box-sizing: border-box; }
     body { background-color: #09090b; color: #e4e4e7; font-family: 'Inter', sans-serif; margin: 0; line-height: 1.6; }
+    
     .zy-header { background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #27272a; padding: 15px 0; position: sticky; top: 0; z-index: 100; }
     .zy-inner { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-    .zy-main-container { padding: 60px 20px; max-width: 1000px; margin: 0 auto; text-align: center; }
+    
+    .zy-main-container { padding: 40px 20px; max-width: 1000px; margin: 0 auto; text-align: center; }
     h1 { font-size: 32px; color: #fff; margin-bottom: 10px; }
     h2 { margin-top: 60px; color: #fff; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 10px; border-bottom: 1px solid #27272a; padding-bottom: 15px; }
     p { color: #a1a1aa; max-width: 750px; margin: 15px auto 30px; }
 
-    /* Horizontal Tier Grid */
+    /* Referral Tiers Grid - ORIGINAL LOOK PRESERVED */
     .tier-grid { 
       display: grid; 
       grid-template-columns: repeat(5, 1fr); 
       gap: 15px; 
       margin: 40px 0; 
+      width: 100%;
     }
+
     .tier-card { 
       background: rgba(24, 24, 27, 0.6); 
+      backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.08); 
-      border-radius: 12px; 
-      padding: 20px 10px; 
+      border-radius: 16px; 
+      padding: 25px 15px; 
+      text-align: center;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
     }
-    .tier-name { font-weight: 700; font-size: 13px; color: #fff; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-    .tier-rate { font-size: 26px; color: #10b981; font-weight: 800; display: block; }
-    .tier-req { font-size: 11px; color: #71717a; font-weight: 600; }
 
-    /* Content Styling */
-    .docs-content-block { text-align: left; max-width: 800px; margin: 0 auto; background: rgba(255, 255, 255, 0.02); padding: 30px; border-radius: 16px; border: 1px solid #27272a; }
-    .highlight-box { background: rgba(59, 130, 246, 0.05); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 25px 0; }
-    ol li { margin-bottom: 15px; color: #e4e4e7; }
-    
-    /* Responsive */
+    .tier-name { font-weight: 700; font-size: 14px; color: #fff; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    .tier-rate { font-size: 28px; color: #10b981; font-weight: 800; display: block; margin-bottom: 5px; }
+    .tier-req { font-size: 12px; color: #71717a; font-weight: 600; }
+
+    /* RESPONSIVE STACKING LOGIC */
     @media (max-width: 1024px) { .tier-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 768px) { .tier-grid { grid-template-columns: repeat(2, 1fr); } .zy-inner { flex-direction: row; } }
-    @media (max-width: 480px) { .tier-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .tier-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .tier-grid { grid-template-columns: 1fr; } .tier-card { padding: 30px 20px; } }
+
+    .docs-content-block { text-align: left; max-width: 800px; margin: 0 auto; background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); padding: 30px; border-radius: 16px; margin-top: 20px; }
+    .highlight-box { background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); padding: 20px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #3b82f6; }
   </style>
 </head>
 <body>
@@ -58,64 +64,49 @@
 
   <div class="zy-main-container">
     <h1>Documentation</h1>
-    <p>Learn how to leverage institutional-grade lending and the 5-tier referral system to maximize your passive income on Base.</p>
+    <p>The technical foundation of ZapApy V2 Pro yield automation.</p>
+
+    <h2>🛡️ Fairness & Principal Guarantee</h2>
+    <div class="docs-content-block">
+      <h3 style="margin-top:0; color:#10b981;">Is the 80% Tier Unfair?</h3>
+      <p style="margin:0; text-align: left; color: #e4e4e7;">While high tiers can earn up to 80% commission, it is mathematically impossible for an upline to "take" a recruit's money. Here is why:</p>
+      
+      <div class="highlight-box">
+        <strong>The Principal Rule:</strong> Referral commissions are <u>only</u> calculated from <strong>Net Profit</strong> generated during the stay. Your initial deposit is 100% protected by the smart contract.
+      </div>
+
+      <ul style="margin-top:20px; color: #e4e4e7;">
+        <li><strong>Capital Safety:</strong> If you deposit $1,000, you will always be able to withdraw your $1,000 (subject to the 76h lock).</li>
+        <li><strong>Profit Sharing:</strong> We only divide the <em>extra</em> money the vault earned for you.</li>
+        <li><strong>Protocol Incentive:</strong> The 80% rate rewards high-capital "Whales" for providing liquidity to the ecosystem.</li>
+      </ul>
+    </div>
 
     <h2>💰 Earning From Referrals</h2>
     <div class="docs-content-block">
-      <p style="margin-left: 0; text-align: left;">ZapApy V2 Pro uses a <strong>Yield-Share Model</strong>. You earn a continuous percentage of the profits generated by your network.</p>
-      <ol>
-        <li><strong>Permanent Link:</strong> When a user "Zaps In" using your link, they are permanently tied to your wallet as a recruit.</li>
-        <li><strong>Profit Generation:</strong> Their deposit earns auto-compounding interest in Moonwell MetaMorpho vaults.</li>
-        <li><strong>Instant Settlement:</strong> When your recruit "Zaps Out," the contract calculates their profit. Your commission (10% - 80%) is instantly sent to your wallet.</li>
-      </ol>
-      
-      <div class="highlight-box">
-        <strong>Zero-Loss Philosophy:</strong> Commissions are paid from the protocol's performance fee. Recruits always keep 100% of their initial principal.
-      </div>
+      <p style="margin:0; text-align: left; color: #e4e4e7;">ZapApy V2 Pro uses a <strong>Yield-Share Model</strong>. You earn a continuous percentage of the profits generated by your network.</p>
+      <ul style="margin-top:20px; color: #e4e4e7;">
+        <li><strong>Permanent Link:</strong> Users who Zap In via your link are tied to you forever.</li>
+        <li><strong>Yield Generation:</strong> Recruits earn interest in Moonwell MetaMorpho vaults.</li>
+        <li><strong>Instant Settlement:</strong> When they withdraw, your commission (10%-80%) is sent to you instantly.</li>
+      </ul>
     </div>
 
     <h2>🔮 Referral Power Tiers</h2>
-    <p>Increase your own deposit to level up your commission rate. The contract verifies your tier at the moment of a recruit's withdrawal.</p>
     <div class="tier-grid">
-      <div class="tier-card" style="border-top: 3px solid #3b82f6;">
-        <span class="tier-name">Spark</span>
-        <span class="tier-rate">10%</span>
-        <span class="tier-req">$50+ USDC</span>
-      </div>
-      <div class="tier-card" style="border-top: 3px solid #8b5cf6;">
-        <span class="tier-name">Volt</span>
-        <span class="tier-rate">20%</span>
-        <span class="tier-req">$100+ USDC</span>
-      </div>
-      <div class="tier-card" style="border-top: 3px solid #10b981;">
-        <span class="tier-name">Surge</span>
-        <span class="tier-rate">30%</span>
-        <span class="tier-req">$200+ USDC</span>
-      </div>
-      <div class="tier-card" style="border-top: 3px solid #f59e0b;">
-        <span class="tier-name">Thunder</span>
-        <span class="tier-rate">50%</span>
-        <span class="tier-req">$1k+ USDC</span>
-      </div>
-      <div class="tier-card" style="border-top: 3px solid #ef4444;">
-        <span class="tier-name">Lightning</span>
-        <span class="tier-rate">80%</span>
-        <span class="tier-req">$5k+ USDC</span>
-      </div>
+      <div class="tier-card"><span class="tier-name">Spark</span><span class="tier-rate">10%</span><span class="tier-req">$50+ USDC</span></div>
+      <div class="tier-card"><span class="tier-name">Volt</span><span class="tier-rate">20%</span><span class="tier-req">$100+ USDC</span></div>
+      <div class="tier-card"><span class="tier-name">Surge</span><span class="tier-rate">30%</span><span class="tier-req">$200+ USDC</span></div>
+      <div class="tier-card"><span class="tier-name">Thunder</span><span class="tier-rate">50%</span><span class="tier-req">$1k+ USDC</span></div>
+      <div class="tier-card"><span class="tier-name">Lightning</span><span class="tier-rate">80%</span><span class="tier-req">$5k+ USDC</span></div>
     </div>
 
     <h2>⚙️ Protocol Mechanics</h2>
     <div class="docs-content-block">
-      <h3>Yield Strategy</h3>
-      <p style="margin-left: 0;">Deposits are routed to <strong>Moonwell MetaMorpho</strong> (USDC) vaults on Base. Yield is generated through over-collateralized lending and compounds every block.</p>
-      
-      <h3>76-Hour Loyalty Lock</h3>
-      <p style="margin-left: 0;">A 76-hour timer starts on deposit to protect pool stability.
-        <ul>
-          <li><strong>Standard Withdrawal:</strong> Full Principal + Profits.</li>
-          <li><strong>Early Exit:</strong> 1% Penalty on total balance.</li>
-        </ul>
-      </p>
+      <h3 style="margin-top:0; color:#fff;">76-Hour Loyalty Lock</h3>
+      <p style="margin:0; text-align:left; color:#e4e4e7;">To ensure stability, deposits have a 76-hour timer. 
+        <strong>Standard Exit:</strong> Full principal + profit share. 
+        <strong>Early Exit:</strong> 1% penalty on total balance.</p>
     </div>
 
     <footer style="margin-top: 80px; text-align: center; color: #52525b; font-size: 11px;">
