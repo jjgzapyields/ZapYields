@@ -1,20 +1,18 @@
-const VAULT_ADDR = "0x671e4F904E07a392785E031c2b0B127329Eb4506"; 
+const VAULT_ADDR = "0x671e4f904e07a392785e031c2b0b127329eb4506"; // Your verified address
 const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
-// Updated ABI: Includes Tier Logic & Event Emitters
 const V_ABI = [
   "function zapIn(uint256 a, address r) external",
   "function zapOut() external",
   "function getAccountValue(address u) view returns (uint256)",
   "function getReferralEarnings(address u) view returns (uint256)",
-  "function getReferralRate(uint256 p) view returns (uint256)", 
+  "function getReferralRate(uint256 p) view returns (uint256)",
   "function users(address) view returns (uint256 p, uint256 s, address ref, uint256 earn, uint256 time)",
   "event ZapIn(address indexed user, uint256 amount, address indexed referrer)"
 ];
 const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
 
-let signer, provider, vault, usdc;
-let tickerInterval;
+let signer, provider, vault, usdc, tickerInterval;
 
 window.onload = () => {
   document.getElementById('connectBtn').onclick = connectWallet;
@@ -25,141 +23,110 @@ window.onload = () => {
   document.getElementById('copyRefBtn').onclick = copyReferral;
 
   if (window.ethereum && localStorage.getItem('isWalletConnected') === 'true') {
-    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-    provider.listAccounts().then(accs => { if (accs.length > 0) setupSession(accs[0]); });
+    connectWallet();
   }
 };
 
-async function connectWallet(e) {
-  if(e) e.preventDefault();
+async function connectWallet() {
   try {
-    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: "0x2105" }] });
-    const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    localStorage.setItem('isWalletConnected', 'true');
-    setupSession(accs[0]);
-  } catch (err) { updateStatus("Failed to connect.", true); }
+    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    await provider.send("eth_requestAccounts", []);
+    const { chainId } = await provider.getNetwork();
+    
+    if (chainId !== 8453) {
+      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: "0x2105" }] });
+    }
+    
+    signer = provider.getSigner();
+    const addr = await signer.getAddress();
+    setupSession(addr);
+  } catch (err) { updateStatus("Switch to Base Network", true); }
 }
 
 async function setupSession(addr) {
-  provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-  signer = provider.getSigner();
   vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
   usdc = new ethers.Contract(USDC_ADDR, U_ABI, signer);
-
+  localStorage.setItem('isWalletConnected', 'true');
   document.getElementById('connectBtn').classList.add('hidden');
   document.getElementById('disconnectBtn').classList.remove('hidden');
-  updateStatus("System Live", false);
+  updateStatus("Connected to Base", false);
   refreshStats(addr);
 }
 
 async function refreshStats(addr) {
-  if (!addr || !ethers.utils.isAddress(addr)) return;
-
   try {
     const bal = await vault.getAccountValue(addr);
-    const refEarns = await vault.getReferralEarnings(addr);
     const userData = await vault.users(addr);
-
     const principal = parseFloat(ethers.utils.formatUnits(userData.p, 6));
     const currentVal = parseFloat(ethers.utils.formatUnits(bal, 6));
-    const profit = currentVal > principal ? currentVal - principal : 0;
-
+    
     document.getElementById('principalDisplay').innerText = principal.toFixed(2);
-    document.getElementById('profitDisplay').innerText = profit.toFixed(4);
-    document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(refEarns, 6)).toFixed(4);
+    document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(userData.earn, 6)).toFixed(4);
 
-    // --- BUTTON STATE MANAGEMENT ---
-    if (principal > 0) {
-      document.getElementById('zapOutBtn').classList.remove('disabled-btn');
-    } else {
-      document.getElementById('zapOutBtn').classList.add('disabled-btn');
-    }
+    if (principal > 0) document.getElementById('zapOutBtn').classList.remove('disabled-btn');
 
-    // --- 🚨 FETCH LIVE REFERRAL TIER & RECRUITS ---
-    try {
-      const rate = await vault.getReferralRate(userData.p);
-      const filter = vault.filters.ZapIn(null, null, addr);
-      const logs = await vault.queryFilter(filter, -10000); // Scans last 10k blocks for speed
-      const uniqueRecruits = new Set(logs.map(log => log.args.user)).size;
+    // Referral Count via Logs
+    const filter = vault.filters.ZapIn(null, null, addr);
+    const logs = await vault.queryFilter(filter, -10000);
+    document.getElementById('refCountDisplay').innerText = new Set(logs.map(l => l.args.user)).size;
 
-      document.getElementById('refCountDisplay').innerText = uniqueRecruits;
-      
-      // Optional: Log the rate to the console for testing
-      console.log(`Current Referral Payout Tier: ${rate}%`);
-    } catch (refErr) {
-      console.warn("Event query failed:", refErr);
-    }
-
-    // --- REAL-TIME TICKER ---
-    const growthPerSecond = ((currentVal * 0.091) / 31536000);
-    document.getElementById('perSecondDisplay').innerText = growthPerSecond.toFixed(8);
-
-    const growthPerMs = growthPerSecond / 1000;
+    // Ticker Logic (9.1% APY)
+    const growthPerSec = (currentVal * 0.091) / 31536000;
+    document.getElementById('perSecondDisplay').innerText = growthPerSec.toFixed(8);
     let liveVal = currentVal;
     clearInterval(tickerInterval);
     tickerInterval = setInterval(() => {
-      liveVal += (growthPerMs * 50);
-      document.getElementById('yieldDisplay').innerText = liveVal.toFixed(6); 
+      liveVal += (growthPerSec / 20);
+      document.getElementById('yieldDisplay').innerText = liveVal.toFixed(6);
     }, 50);
-
-  } catch (err) {
-    console.error("Stats Error:", err);
-  }
+  } catch (e) { console.error(e); }
 }
 
-async function handleApprove(e) {
-  if(e) e.preventDefault();
+async function handleApprove() {
   const val = document.getElementById('amountInput').value;
-  if (!val || val < 10) return updateStatus("Min 10 USDC", true);
+  if (val < 10) return updateStatus("Min 10 USDC", true);
   try {
-    updateStatus("Approving USDC...", false);
+    updateStatus("Approving...", false);
     const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(val, 6));
-    await tx.wait(); 
-    updateStatus("Approved! Proceed to Zap In.", false);
-    document.getElementById('zapInBtn').classList.remove('disabled-btn'); 
-  } catch (err) { updateStatus("Approval Rejected", true); }
+    await tx.wait();
+    updateStatus("Approved!", false);
+    document.getElementById('zapInBtn').classList.remove('disabled-btn');
+  } catch (e) { updateStatus("Approval Failed", true); }
 }
 
-async function handleZapIn(e) {
-  if(e) e.preventDefault();
+async function handleZapIn() {
   const val = document.getElementById('amountInput').value;
   const ref = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
   try {
-    updateStatus("Deploying Capital...", false);
-    const tx = await vault.zapIn(ethers.utils.parseUnits(val, 6), ref, { gasLimit: 400000 });
+    updateStatus("Zapping In...", false);
+    const tx = await vault.zapIn(ethers.utils.parseUnits(val, 6), ref, { gasLimit: 300000 });
     await tx.wait();
-    updateStatus("Zap Success! Yield active.", false);
-    refreshStats(await signer.getAddress());
-  } catch (err) { updateStatus("Zap Failed", true); }
+    location.reload();
+  } catch (e) { updateStatus("Zap Failed", true); }
 }
 
-async function handleZapOut(e) {
-  if(e) e.preventDefault();
+async function handleZapOut() {
   try {
-    updateStatus("Withdrawing...", false);
-    const tx = await vault.zapOut({ gasLimit: 600000 });
+    updateStatus("Zapping Out...", false);
+    const tx = await vault.zapOut({ gasLimit: 500000 });
     await tx.wait();
-    updateStatus("Withdrawal Success!", false);
-    refreshStats(await signer.getAddress());
-  } catch (err) { updateStatus("Withdrawal Failed", true); }
+    location.reload();
+  } catch (e) { updateStatus("Error Withdrawing", true); }
 }
 
-async function copyReferral(e) {
-  if(e) e.preventDefault();
+async function copyReferral() {
   const addr = await signer.getAddress();
-  const link = window.location.origin + window.location.pathname + "?ref=" + addr;
-  navigator.clipboard.writeText(link);
-  alert("Referral Link Copied! Spread the word to grow your commission tier.");
+  navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?ref=${addr}`);
+  alert("Link Copied!");
 }
 
-function disconnectWallet(e) {
-  if(e) e.preventDefault();
+function disconnectWallet() {
   localStorage.setItem('isWalletConnected', 'false');
-  window.location.reload();
+  location.reload();
 }
 
-function updateStatus(msg, isErr) {
+function updateStatus(m, e) {
   const s = document.getElementById('statusLabel');
-  s.innerText = msg;
-  s.className = isErr ? "status-msg status-error" : "status-msg";
+  s.innerText = m;
+  s.className = e ? "status-msg status-error" : "status-msg";
 }
