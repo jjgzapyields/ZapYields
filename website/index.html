@@ -25,12 +25,17 @@
     .apy-badge { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 800; }
     .disabled-btn { opacity: 0.3 !important; pointer-events: none !important; background: #52525b !important; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-    
+    .zy-nav {display: flex;align-items: center;gap: 20px;}
     /* Mobile Warning Modal Styling */
     #warningModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
 
     @media(max-width: 768px) {
-	flex-direction: row; flex-wrap: wrap; ustify-content: center;
+	.zy-inner {
+		justify-content: center;
+	}
+	.zy-nav {
+		flex-direction: row; flex-wrap: wrap; justify-content: center;
+	}
    }
   </style>
 </head>
@@ -48,7 +53,7 @@
 
   <div class="zy-header">
     <div class="zy-inner">
-      <div style="display: flex;align-items: center;gap: 20px;">
+      <div class="zy-nav">
         <div class="zy-logo">ZapApy⚡ <span style="font-size: 10px; color: #10b981;">V2 PRO</span></div>
         <div id="networkStatus" style="display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.3);">
           <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: pulse 2s infinite;"></div>
