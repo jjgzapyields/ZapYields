@@ -8,72 +8,41 @@
   <link href="css/components.css" rel="stylesheet" type="text/css">
   <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
   <style>
-    /* 1. Core Layout Reset */
     * { box-sizing: border-box; }
     body { background-color: #09090b; color: #e4e4e7; font-family: 'Inter', sans-serif; margin: 0; line-height: 1.6; }
-
-    /* 2. Responsive Header */
     .zy-header { background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #27272a; padding: 15px 0; position: sticky; top: 0; z-index: 100; }
     .zy-inner { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-    
-    /* 3. Main Content Wrapper */
-    .zy-main-container { padding: 60px 20px; max-width: 1100px; margin: 0 auto; text-align: center; }
-    h1 { font-size: 36px; color: #fff; margin-bottom: 10px; }
+    .zy-main-container { padding: 60px 20px; max-width: 1000px; margin: 0 auto; text-align: center; }
+    h1 { font-size: 32px; color: #fff; margin-bottom: 10px; }
     h2 { margin-top: 60px; color: #fff; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 10px; border-bottom: 1px solid #27272a; padding-bottom: 15px; }
-    p { color: #a1a1aa; max-width: 800px; margin: 15px auto 40px; }
+    p { color: #a1a1aa; max-width: 750px; margin: 15px auto 30px; }
 
-    /* 4. FIXED: Horizontal Referral Tiers Grid */
+    /* Horizontal Tier Grid */
     .tier-grid { 
       display: grid; 
-      /* Uses 1fr to ensure 5 equal columns on desktop */
       grid-template-columns: repeat(5, 1fr); 
       gap: 15px; 
       margin: 40px 0; 
-      width: 100%;
     }
     .tier-card { 
       background: rgba(24, 24, 27, 0.6); 
-      border: 1px solid rgba(255, 255, 255, 0.1); 
+      border: 1px solid rgba(255, 255, 255, 0.08); 
       border-radius: 12px; 
       padding: 20px 10px; 
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
     }
-    .tier-card:hover { transform: translateY(-5px); border-color: #3b82f6; background: rgba(30, 30, 35, 0.8); }
     .tier-name { font-weight: 700; font-size: 13px; color: #fff; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-    .tier-rate { font-size: 26px; color: #10b981; font-weight: 800; display: block; margin-bottom: 4px; }
+    .tier-rate { font-size: 26px; color: #10b981; font-weight: 800; display: block; }
     .tier-req { font-size: 11px; color: #71717a; font-weight: 600; }
 
-    /* 5. Mechanics & Status */
-    .mechanics-content { text-align: center; max-width: 800px; margin: 0 auto; }
-    .highlight-box { 
-      background: rgba(59, 130, 246, 0.05); 
-      border-radius: 12px; 
-      padding: 25px; 
-      margin: 40px auto;
-      border-left: 4px solid #3b82f6;
-      text-align: left;
-    }
-    .status-table-wrap { overflow-x: auto; margin-top: 20px; border-radius: 12px; border: 1px solid #27272a; }
-    table { width: 100%; border-collapse: collapse; background: #18181b; }
-    th, td { padding: 18px; text-align: left; border-bottom: 1px solid #27272a; font-size: 14px; }
-    th { background: #27272a; color: #a1a1aa; font-weight: 600; text-transform: uppercase; font-size: 11px; width: 35%; }
-
-    /* 6. Responsive Breakpoints */
-    @media (max-width: 1024px) {
-      .tier-grid { grid-template-columns: repeat(3, 1fr); } /* 3 columns for tablets */
-    }
-    @media (max-width: 768px) {
-      .tier-grid { grid-template-columns: repeat(2, 1fr); } /* 2 columns for mobile */
-      .zy-inner { flex-direction: column; gap: 15px; }
-      h1 { font-size: 28px; }
-    }
-    @media (max-width: 480px) {
-      .tier-grid { grid-template-columns: 1fr; } /* Stack only on very small screens */
-    }
+    /* Content Styling */
+    .docs-content-block { text-align: left; max-width: 800px; margin: 0 auto; background: rgba(255, 255, 255, 0.02); padding: 30px; border-radius: 16px; border: 1px solid #27272a; }
+    .highlight-box { background: rgba(59, 130, 246, 0.05); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 25px 0; }
+    ol li { margin-bottom: 15px; color: #e4e4e7; }
+    
+    /* Responsive */
+    @media (max-width: 1024px) { .tier-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 768px) { .tier-grid { grid-template-columns: repeat(2, 1fr); } .zy-inner { flex-direction: row; } }
+    @media (max-width: 480px) { .tier-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -88,12 +57,25 @@
   </div>
 
   <div class="zy-main-container">
-    <h1>Protocol Documentation</h1>
-    <p>Institutional-grade yield automation and a high-performance tiered referral system powered by the Base Network.</p>
+    <h1>Documentation</h1>
+    <p>Learn how to leverage institutional-grade lending and the 5-tier referral system to maximize your passive income on Base.</p>
+
+    <h2>💰 Earning From Referrals</h2>
+    <div class="docs-content-block">
+      <p style="margin-left: 0; text-align: left;">ZapApy V2 Pro uses a <strong>Yield-Share Model</strong>. You earn a continuous percentage of the profits generated by your network.</p>
+      <ol>
+        <li><strong>Permanent Link:</strong> When a user "Zaps In" using your link, they are permanently tied to your wallet as a recruit.</li>
+        <li><strong>Profit Generation:</strong> Their deposit earns auto-compounding interest in Moonwell MetaMorpho vaults.</li>
+        <li><strong>Instant Settlement:</strong> When your recruit "Zaps Out," the contract calculates their profit. Your commission (10% - 80%) is instantly sent to your wallet.</li>
+      </ol>
+      
+      <div class="highlight-box">
+        <strong>Zero-Loss Philosophy:</strong> Commissions are paid from the protocol's performance fee. Recruits always keep 100% of their initial principal.
+      </div>
+    </div>
 
     <h2>🔮 Referral Power Tiers</h2>
-    <p>Higher deposits unlock greater commission rates. Ranks are checked in real-time based on your total Principal balance.</p>
-    
+    <p>Increase your own deposit to level up your commission rate. The contract verifies your tier at the moment of a recruit's withdrawal.</p>
     <div class="tier-grid">
       <div class="tier-card" style="border-top: 3px solid #3b82f6;">
         <span class="tier-name">Spark</span>
@@ -122,45 +104,22 @@
       </div>
     </div>
 
-    <div class="mechanics-content">
-      <h2>⚙️ Protocol Mechanics</h2>
+    <h2>⚙️ Protocol Mechanics</h2>
+    <div class="docs-content-block">
+      <h3>Yield Strategy</h3>
+      <p style="margin-left: 0;">Deposits are routed to <strong>Moonwell MetaMorpho</strong> (USDC) vaults on Base. Yield is generated through over-collateralized lending and compounds every block.</p>
       
-      <div style="margin-bottom: 40px;">
-        <h3 style="color: #fff;">Yield Strategy</h3>
-        <p>Deposits are routed to <strong>Moonwell MetaMorpho</strong> (USDC) vaults on Base. Profits generate from borrower demand and compound every block.</p>
-      </div>
-
-      <div style="margin-bottom: 40px;">
-        <h3 style="color: #fff;">76-Hour Loyalty Lock</h3>
-        <p>To prevent pool instability, deposits are subject to a 76-hour timer. Early exits incur a 1% penalty on the total balance.</p>
-      </div>
-
-      <div class="highlight-box">
-        <strong style="color: #fff; display: block; margin-bottom: 5px;">Zero-Loss Referral Model</strong>
-        Commissions are paid out of the protocol's performance fee, never from the recruit's principal deposit.
-      </div>
-
-      <h2>🖥️ System Status</h2>
-      <div class="status-table-wrap">
-        <table>
-          <tr>
-            <th>Network</th>
-            <td>Base Mainnet (8453)</td>
-          </tr>
-          <tr>
-            <th>Security</th>
-            <td>Verified Contract Source</td>
-          </tr>
-          <tr>
-            <th>Asset</th>
-            <td>USDC (Native Circle)</td>
-          </tr>
-        </table>
-      </div>
+      <h3>76-Hour Loyalty Lock</h3>
+      <p style="margin-left: 0;">A 76-hour timer starts on deposit to protect pool stability.
+        <ul>
+          <li><strong>Standard Withdrawal:</strong> Full Principal + Profits.</li>
+          <li><strong>Early Exit:</strong> 1% Penalty on total balance.</li>
+        </ul>
+      </p>
     </div>
 
     <footer style="margin-top: 80px; text-align: center; color: #52525b; font-size: 11px;">
-      ZapApy V2 Pro • 2026 • Built on Base Network
+      ZapApy V2 Pro • 2026 • Verified on BaseScan
     </footer>
   </div>
 </body>
