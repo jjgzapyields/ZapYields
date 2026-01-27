@@ -8,76 +8,71 @@
   <link href="css/components.css" rel="stylesheet" type="text/css">
   <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
   <style>
+    /* 1. Core Layout Reset */
     * { box-sizing: border-box; }
     body { background-color: #09090b; color: #e4e4e7; font-family: 'Inter', sans-serif; margin: 0; line-height: 1.6; }
 
-    /* Header */
+    /* 2. Responsive Header */
     .zy-header { background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #27272a; padding: 15px 0; position: sticky; top: 0; z-index: 100; }
     .zy-inner { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
     
-    /* Container */
-    .zy-main-container { padding: 60px 20px; max-width: 1000px; margin: 0 auto; text-align: center; }
-    h1 { font-size: 32px; color: #fff; margin-bottom: 10px; }
-    h2 { margin-top: 60px; color: #fff; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-    p { color: #a1a1aa; max-width: 700px; margin: 10px auto 30px; }
+    /* 3. Main Content Wrapper */
+    .zy-main-container { padding: 60px 20px; max-width: 1100px; margin: 0 auto; text-align: center; }
+    h1 { font-size: 36px; color: #fff; margin-bottom: 10px; }
+    h2 { margin-top: 60px; color: #fff; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 10px; border-bottom: 1px solid #27272a; padding-bottom: 15px; }
+    p { color: #a1a1aa; max-width: 800px; margin: 15px auto 40px; }
 
-    /* Referral Tiers Grid - Fixed for Horizontal Layout */
+    /* 4. FIXED: Horizontal Referral Tiers Grid */
     .tier-grid { 
       display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
-      gap: 20px; 
+      /* Uses 1fr to ensure 5 equal columns on desktop */
+      grid-template-columns: repeat(5, 1fr); 
+      gap: 15px; 
       margin: 40px 0; 
+      width: 100%;
     }
     .tier-card { 
       background: rgba(24, 24, 27, 0.6); 
-      border: 1px solid rgba(255, 255, 255, 0.08); 
-      border-radius: 16px; 
-      padding: 25px 15px; 
-      transition: transform 0.2s;
+      border: 1px solid rgba(255, 255, 255, 0.1); 
+      border-radius: 12px; 
+      padding: 20px 10px; 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
     }
-    .tier-card:hover { transform: translateY(-5px); border-color: rgba(255, 255, 255, 0.2); }
-    .tier-name { font-weight: 700; font-size: 14px; color: #fff; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-    .tier-rate { font-size: 28px; color: #10b981; font-weight: 800; display: block; margin-bottom: 5px; }
-    .tier-req { font-size: 12px; color: #71717a; font-weight: 600; }
+    .tier-card:hover { transform: translateY(-5px); border-color: #3b82f6; background: rgba(30, 30, 35, 0.8); }
+    .tier-name { font-weight: 700; font-size: 13px; color: #fff; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    .tier-rate { font-size: 26px; color: #10b981; font-weight: 800; display: block; margin-bottom: 4px; }
+    .tier-req { font-size: 11px; color: #71717a; font-weight: 600; }
 
-    /* Mechanics Section */
-    .mechanics-wrap { text-align: left; max-width: 750px; margin: 0 auto; }
-    .mechanic-item { margin-bottom: 40px; }
-    .mechanic-item h3 { color: #fff; font-size: 18px; margin-bottom: 10px; text-align: center; }
-    
+    /* 5. Mechanics & Status */
+    .mechanics-content { text-align: center; max-width: 800px; margin: 0 auto; }
     .highlight-box { 
       background: rgba(59, 130, 246, 0.05); 
-      border: 1px solid rgba(59, 130, 246, 0.2); 
-      padding: 20px; 
       border-radius: 12px; 
+      padding: 25px; 
       margin: 40px auto;
       border-left: 4px solid #3b82f6;
       text-align: left;
     }
-
-    /* System Status Table */
-    .status-table { 
-      width: 100%; 
-      max-width: 750px; 
-      margin: 20px auto; 
-      background: #18181b; 
-      border-radius: 12px; 
-      overflow: hidden; 
-      border: 1px solid #27272a;
-    }
-    table { width: 100%; border-collapse: collapse; }
+    .status-table-wrap { overflow-x: auto; margin-top: 20px; border-radius: 12px; border: 1px solid #27272a; }
+    table { width: 100%; border-collapse: collapse; background: #18181b; }
     th, td { padding: 18px; text-align: left; border-bottom: 1px solid #27272a; font-size: 14px; }
-    th { background: #27272a; color: #71717a; font-weight: 600; text-transform: uppercase; font-size: 11px; width: 40%; }
-    td { color: #e4e4e7; }
+    th { background: #27272a; color: #a1a1aa; font-weight: 600; text-transform: uppercase; font-size: 11px; width: 35%; }
 
-    /* Mobile Responsive */
+    /* 6. Responsive Breakpoints */
+    @media (max-width: 1024px) {
+      .tier-grid { grid-template-columns: repeat(3, 1fr); } /* 3 columns for tablets */
+    }
     @media (max-width: 768px) {
-      .tier-grid { grid-template-columns: 1fr 1fr; }
-      .zy-inner { flex-direction: row; }
+      .tier-grid { grid-template-columns: repeat(2, 1fr); } /* 2 columns for mobile */
+      .zy-inner { flex-direction: column; gap: 15px; }
       h1 { font-size: 28px; }
     }
     @media (max-width: 480px) {
-      .tier-grid { grid-template-columns: 1fr; }
+      .tier-grid { grid-template-columns: 1fr; } /* Stack only on very small screens */
     }
   </style>
 </head>
@@ -93,11 +88,11 @@
   </div>
 
   <div class="zy-main-container">
-    <h1>Documentation</h1>
-    <p>Understand the mechanics behind the automated yield and tiered referral system built on Base.</p>
+    <h1>Protocol Documentation</h1>
+    <p>Institutional-grade yield automation and a high-performance tiered referral system powered by the Base Network.</p>
 
     <h2>🔮 Referral Power Tiers</h2>
-    <p>Your commission rate is determined by your total <strong>Principal</strong> deposit. High-tier status unlocks significantly larger shares of your network's generated profit.</p>
+    <p>Higher deposits unlock greater commission rates. Ranks are checked in real-time based on your total Principal balance.</p>
     
     <div class="tier-grid">
       <div class="tier-card" style="border-top: 3px solid #3b82f6;">
@@ -127,39 +122,38 @@
       </div>
     </div>
 
-    <div class="mechanics-wrap">
+    <div class="mechanics-content">
       <h2>⚙️ Protocol Mechanics</h2>
       
-      <div class="mechanic-item">
-        <h3>Yield Strategy</h3>
-        <p style="text-align: center;">Deposits are Zapped into <strong>Moonwell MetaMorpho</strong> (USDC) vaults on Base. Profits are generated via over-collateralized lending and compound every block.</p>
+      <div style="margin-bottom: 40px;">
+        <h3 style="color: #fff;">Yield Strategy</h3>
+        <p>Deposits are routed to <strong>Moonwell MetaMorpho</strong> (USDC) vaults on Base. Profits generate from borrower demand and compound every block.</p>
       </div>
 
-      <div class="mechanic-item">
-        <h3>The 76-Hour Loyalty Lock</h3>
-        <p style="text-align: center;">To prevent flash-loan volatility, deposits are subject to a 76-hour timer. 
-          Standard exits receive full principal and profit. Early exits incur a 1% penalty on the total balance.</p>
+      <div style="margin-bottom: 40px;">
+        <h3 style="color: #fff;">76-Hour Loyalty Lock</h3>
+        <p>To prevent pool instability, deposits are subject to a 76-hour timer. Early exits incur a 1% penalty on the total balance.</p>
       </div>
 
       <div class="highlight-box">
         <strong style="color: #fff; display: block; margin-bottom: 5px;">Zero-Loss Referral Model</strong>
-        Commissions are paid out of the protocol's performance fee, never from the recruit's principal deposit. This ensures users always retain 100% of their initial capital.
+        Commissions are paid out of the protocol's performance fee, never from the recruit's principal deposit.
       </div>
 
       <h2>🖥️ System Status</h2>
-      <div class="status-table">
+      <div class="status-table-wrap">
         <table>
           <tr>
             <th>Network</th>
             <td>Base Mainnet (8453)</td>
           </tr>
           <tr>
-            <th>Underlying Vault</th>
-            <td>Morpho mUSDC (Moonwell)</td>
-          </tr>
-          <tr>
             <th>Security</th>
             <td>Verified Contract Source</td>
+          </tr>
+          <tr>
+            <th>Asset</th>
+            <td>USDC (Native Circle)</td>
           </tr>
         </table>
       </div>
