@@ -23,29 +23,31 @@
     h3 { color: #fff; margin-top: 30px; font-size: 18px; }
     p { color: #a1a1aa; margin-bottom: 25px; font-size: 15px; }
 
-    /* Tier Grid */
+    /* Tables & Grids */
     .tier-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin: 30px 0; }
     .tier-card { background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 25px; text-align: center; }
     .tier-name { font-weight: 700; font-size: 14px; color: #fff; text-transform: uppercase; }
     .tier-rate { font-size: 28px; color: #10b981; font-weight: 800; display: block; }
-    .tier-req { font-size: 12px; color: #71717a; }
-
-    /* Technical Data Grid */
+    
     .tech-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
     .tech-item { background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 8px; border: 1px solid #27272a; }
-    .tech-label { font-size: 11px; text-transform: uppercase; color: #71717a; font-weight: bold; display: block; margin-bottom: 4px; }
+    .tech-label { font-size: 11px; text-transform: uppercase; color: #71717a; font-weight: bold; display: block; }
     .tech-value { font-size: 14px; color: #e4e4e7; word-break: break-all; font-family: monospace; }
 
-    /* Content Blocks */
+    /* Content Styling */
     .docs-content-block { background: rgba(24, 24, 27, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); padding: 25px; border-radius: 16px; margin-top: 20px; }
-    .highlight-box { background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); padding: 20px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #3b82f6; }
+    .highlight-box { background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #3b82f6; }
     pre { background: #18181b; padding: 15px; border-radius: 8px; overflow-x: auto; border: 1px solid #27272a; font-size: 13px; color: #3b82f6; white-space: pre-wrap; word-break: break-all; }
-    code { color: #3b82f6; font-family: monospace; }
+
+    /* Roadmap List */
+    .roadmap-list { list-style: none; padding: 0; }
+    .roadmap-step { margin-bottom: 25px; border-left: 2px solid #3b82f6; padding-left: 20px; }
+    .roadmap-step h4 { margin: 0; color: #fff; font-size: 16px; }
 
     @media (min-width: 768px) {
       h1 { text-align: left; font-size: 32px; }
       .toc-sidebar { display: block; width: 250px; position: sticky; top: 40px; padding: 40px 20px 0 0; align-self: flex-start; }
-      .toc-link { display: block; color: #a1a1aa; text-decoration: none; font-size: 14px; margin-bottom: 12px; transition: 0.2s; }
+      .toc-link { display: block; color: #a1a1aa; text-decoration: none; font-size: 13px; margin-bottom: 12px; transition: 0.2s; }
       .toc-link:hover { color: #3b82f6; }
       .tier-grid { grid-template-columns: repeat(5, 1fr); }
       .tech-grid { grid-template-columns: 1fr 1fr; }
@@ -66,62 +68,77 @@
 
   <div class="docs-wrapper">
     <aside class="toc-sidebar">
-      <h4 style="font-size: 11px; text-transform: uppercase; color: #71717a; margin-bottom: 15px;">Navigation</h4>
+      <h4 style="font-size: 11px; text-transform: uppercase; color: #71717a; margin-bottom: 15px;">Sections</h4>
       <a href="#overview" class="toc-link">📖 Overview</a>
       <a href="#tiers" class="toc-link">🌩️ Power Tiers</a>
-      <a href="#mechanics" class="toc-link">⚙️ Core Mechanics</a>
-      <a href="#promotion" class="toc-link">📣 Promotion Toolkit</a>
+      <a href="#mechanics" class="toc-link">⚙️ Mechanics</a>
+      <a href="#roadmap" class="toc-link">🗺️ Roadmap</a>
+      <a href="#tokenomics" class="toc-link">💎 Tokenomics</a>
       <a href="#technicals" class="toc-link">🖥️ Technicals</a>
-      <a href="#installation" class="toc-link">🚀 Installation</a>
     </aside>
 
     <main class="zy-main-container">
       <section id="overview">
         <h1>📖 Overview</h1>
-        <p>ZapApy V2 Pro is a decentralized yield aggregator built on the <strong>Base Network</strong>. It provides a simplified "Zap" interface into <strong>Moonwell MetaMorpho</strong> vaults. The protocol features a high-performance, 5-tier referral system designed to maximize community growth and reward high-capital depositors.</p>
+        <p>ZapApy V2 Pro is a decentralized yield aggregator built on the <strong>Base Network</strong>. It provides a simplified "Zap" interface into <strong>Moonwell MetaMorpho</strong> vaults, abstracting complex DeFi interactions into single-click efficiency.</p>
       </section>
 
       <section id="tiers">
         <h2>🌩️ Power Tiers (Multiplied Income)</h2>
-        <p>Your referral commission rate is dynamically determined by your personal <strong>Principal</strong> deposit. The protocol automatically checks your tier status at the moment of a recruit's withdrawal to calculate your payout.</p>
+        <p>Commission rates are dynamically determined by your personal <strong>Principal</strong> deposit at the time of a recruit's withdrawal.</p>
         <div class="tier-grid">
-          <div class="tier-card"><span class="tier-name">Spark</span><span class="tier-rate">10%</span><span class="tier-req">$50+ USDC</span></div>
-          <div class="tier-card"><span class="tier-name">Volt</span><span class="tier-rate">20%</span><span class="tier-req">$100+ USDC</span></div>
-          <div class="tier-card"><span class="tier-name">Surge</span><span class="tier-rate">30%</span><span class="tier-req">$200+ USDC</span></div>
-          <div class="tier-card"><span class="tier-name">Thunder</span><span class="tier-rate">50%</span><span class="tier-req">$1k+ USDC</span></div>
-          <div class="tier-card"><span class="tier-name">Lightning</span><span class="tier-rate">80%</span><span class="tier-req">$5k+ USDC</span></div>
+          <div class="tier-card"><span class="tier-name">Spark</span><span class="tier-rate">10%</span><span style="font-size:11px;color:#71717a;">$50+</span></div>
+          <div class="tier-card"><span class="tier-name">Volt</span><span class="tier-rate">20%</span><span style="font-size:11px;color:#71717a;">$100+</span></div>
+          <div class="tier-card"><span class="tier-name">Surge</span><span class="tier-rate">30%</span><span style="font-size:11px;color:#71717a;">$200+</span></div>
+          <div class="tier-card"><span class="tier-name">Thunder</span><span class="tier-rate">50%</span><span style="font-size:11px;color:#71717a;">$1k+</span></div>
+          <div class="tier-card"><span class="tier-name">Lightning</span><span class="tier-rate">80%</span><span style="font-size:11px;color:#71717a;">$5k+</span></div>
         </div>
-        <p style="text-align: center; font-size: 12px; color: #71717a;">Default referral rate is 5% for deposits under $50 USDC.</p>
       </section>
 
       <section id="mechanics">
         <h2>⚙️ Core Protocol Mechanics</h2>
         <div class="docs-content-block">
-          <h3>1. Zero-Loss Principal</h3>
-          <p>User deposits are never taxed or deducted. All protocol fees and referral commissions are paid out <strong>strictly from generated profit</strong>. Users always retain 100% of their initial capital.</p>
-          <h3>2. The 76-Hour Loyalty Lock</h3>
-          <p>To ensure stable liquidity and prevent flash-loan manipulation:
-            <ul style="margin-top: 10px;">
-              <li><strong>Standard Exit:</strong> After 76 hours, users can withdraw 100% principal + profits.</li>
-              <li><strong>Early Exit:</strong> Withdrawing before the 76-hour timer expires triggers a <strong>1% Early-Exit Penalty</strong> on the total balance.</li>
-            </ul>
-          </p>
-          <h3>3. Dynamic APY rendering</h3>
-          <p>The platform renders APY in real-time, reflecting live market utilization and incentive rewards provided by Moonwell. Yield is compounded every block.</p>
+          <h3>🛡️ Zero-Loss Principal</h3>
+          <p>User deposits are never taxed. All referral commissions are paid out <strong>strictly from generated profit</strong>. Your capital is 100% protected.</p>
+          <h3>⏳ 76-Hour Loyalty Lock</h3>
+          <p>Standard exit after 76h. Early exit triggers a <strong>1% Penalty</strong> on total balance.</p>
         </div>
       </section>
 
-      <section id="promotion">
-        <h2>📣 Become a Top Referrer</h2>
+      
+      <section id="roadmap">
+        <h2>🗺️ Project Roadmap</h2>
         <div class="docs-content-block">
-          <p>Use these key points when sharing your link on X or Telegram to maximize conversions:</p>
-          <ul style="color: #e4e4e7;">
-            <li style="margin-bottom: 12px;"><strong>Institutional Grade:</strong> Mention that yield is powered by Moonwell and Morpho.</li>
-            <li style="margin-bottom: 12px;"><strong>Principal Protection:</strong> Emphasize that referrals never cost the recruit their initial capital.</li>
-            <li style="margin-bottom: 12px;"><strong>Instant Payouts:</strong> Remind them that commissions are sent directly to their wallet upon recruit withdrawal.</li>
-          </ul>
+          <div class="roadmap-list">
+            <div class="roadmap-step">
+              <h4>Phase 1: Foundation (Live)</h4>
+              <p style="font-size: 13px; margin: 5px 0;">Mainnet deployment on Base, Tier system activation, and Security verification.</p>
+            </div>
+            <div class="roadmap-step">
+              <h4>Phase 2: Expansion (Q3 2026)</h4>
+              <p style="font-size: 13px; margin: 5px 0;">Referral Leaderboards and the $ZAP Token Generation Event (TGE).</p>
+            </div>
+            <div class="roadmap-step">
+              <h4>Phase 3: Utility (Q4 2026)</h4>
+              <p style="font-size: 13px; margin: 5px 0;">Staking utility for Tier overrides and Buyback & Burn mechanism launch.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      
+      <section id="tokenomics">
+        <h2>💎 Tokenomics ($ZAP)</h2>
+        <div class="docs-content-block">
+          <p>The $ZAP token rewards long-term liquidity providers and active referrers.</p>
+          <div class="tech-grid">
+            <div class="tech-item"><span class="tech-label">Community Rewards</span><span class="tech-value">45%</span></div>
+            <div class="tech-item"><span class="tech-label">Liquidity Pool</span><span class="tech-value">20%</span></div>
+            <div class="tech-item"><span class="tech-label">Team & Dev</span><span class="tech-value">15%</span></div>
+            <div class="tech-item"><span class="tech-label">Treasury</span><span class="tech-value">10%</span></div>
+          </div>
           <div class="highlight-box">
-            <strong>Pro Tip:</strong> Post a screenshot of your "Live Portfolio" ticker moving in real-time. Movement creates curiosity!
+            <strong>Utility:</strong> Staking $ZAP will allow users to reach the ⚡ Lightning Tier with a lower USDC deposit.
           </div>
         </div>
       </section>
@@ -129,25 +146,13 @@
       <section id="technicals">
         <h2>🖥️ Smart Contract Technicals</h2>
         <div class="tech-grid">
-          <div class="tech-item"><span class="tech-label">Network</span><span class="tech-value">Base Mainnet (Chain ID: 8453)</span></div>
+          <div class="tech-item"><span class="tech-label">Network</span><span class="tech-value">Base Mainnet (8453)</span></div>
           <div class="tech-item"><span class="tech-label">USDC Address</span><span class="tech-value">0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</span></div>
-          <div class="tech-item"><span class="tech-label">Vault Provider</span><span class="tech-value">Moonwell MetaMorpho (mUSDC)</span></div>
-          <div class="tech-item"><span class="tech-label">Security</span><span class="tech-value">OpenZeppelin Ownable, ReentrancyGuard, SafeERC20</span></div>
+          <div class="tech-item"><span class="tech-label">Vault</span><span class="tech-value">Moonwell MetaMorpho (mUSDC)</span></div>
         </div>
       </section>
 
-      <section id="installation">
-        <h2>🚀 Deployment & Installation</h2>
-        <div class="docs-content-block">
-          <h3>Prerequisites</h3>
-          <p>Node.js & npm, MetaMask (connected to Base Network), and a deployed instance of the <code>ZapApyV2Pro.sol</code> contract.</p>
-          <h3>Setup</h3>
-          <p>Clone the repository:</p>
-          <pre>git clone https://github.com/yourusername/zapapy-v2-pro.git</pre>
-        </div>
-      </section>
-
-      <footer style="margin-top: 80px; text-align: center; color: #52525b; font-size: 11px;">
+      <footer style="margin-top: 60px; text-align: center; color: #52525b; font-size: 11px;">
         ZapApy V2 Pro • 2026 • Verified on BaseScan
       </footer>
     </main>
