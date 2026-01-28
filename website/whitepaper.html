@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ZapApy V2 Pro | Official Whitepaper</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link href="css/normalize.css" rel="stylesheet" type="text/css">
+  <link href="css/components.css" rel="stylesheet" type="text/css">
+  <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
+  <style>
+    html { scroll-behavior: smooth; }
+    body { background-color: #09090b; color: #e4e4e7; font-family: 'Inter', sans-serif; margin: 0; line-height: 1.8; }
+    
+    /* Screen Styles */
+    .wp-header { background: rgba(9, 9, 11, 0.9); border-bottom: 1px solid #27272a; padding: 20px 0; position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px); }
+    .wp-inner { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    .wp-wrapper { display: flex; max-width: 1200px; margin: 0 auto; width: 100%; padding: 40px 20px; gap: 40px; }
+    .wp-sidebar { width: 280px; position: sticky; top: 120px; align-self: flex-start; display: none; }
+    .wp-toc-link { display: block; color: #a1a1aa; text-decoration: none; font-size: 14px; margin-bottom: 15px; padding-left: 10px; border-left: 2px solid transparent; }
+    .wp-content { flex: 1; max-width: 800px; background: rgba(24, 24, 27, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; padding: 50px; }
+    
+    h1 { font-size: 36px; color: #fff; margin-bottom: 40px; }
+    h2 { font-size: 24px; color: #fff; margin-top: 60px; border-bottom: 1px solid #27272a; padding-bottom: 15px; scroll-margin-top: 100px; }
+    .highlight-card { background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 16px; margin: 40px 0; }
+    .stat-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    .stat-table td, .stat-table th { padding: 12px; border-bottom: 1px solid #27272a; text-align: left; }
+
+    @media (min-width: 992px) { .wp-sidebar { display: block; } }
+
+    /* =========================================
+       PRINT / PDF STYLES
+       ========================================= */
+    @media print {
+      @page { size: A4; margin: 2cm; }
+      
+      body { background: white !important; color: black !important; font-size: 12pt; line-height: 1.5; }
+      
+      /* Hide web-only elements */
+      .wp-header, .wp-sidebar, nav, footer, .no-print { display: none !important; }
+      
+      /* Reset content for the page */
+      .wp-wrapper { display: block; padding: 0; margin: 0; }
+      .wp-content { 
+        max-width: 100%; 
+        background: transparent !important; 
+        border: none !important; 
+        padding: 0 !important; 
+        box-shadow: none !important; 
+      }
+      
+      h1, h2, h3 { color: black !important; page-break-after: avoid; }
+      p { color: #333 !important; orphans: 3; widows: 3; }
+      
+      /* Force new page for each section */
+      section { page-break-before: always; }
+      section:first-child { page-break-before: auto; } /* No break before first page */
+      
+      /* Keep cards and tables together */
+      .highlight-card, .stat-table, tr { page-break-inside: avoid; }
+      
+      .stat-table th, .stat-table td { border-bottom: 1px solid #ddd !important; color: black !important; }
+      
+      /* Ensure background colors print (if browser allows) */
+      .highlight-card { 
+        background-color: #f8f9fa !important; 
+        border: 1px solid #ddd !important;
+        -webkit-print-color-adjust: exact; 
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="wp-header">
+    <div class="wp-inner">
+      <div class="zy-logo">ZapApy⚡ <span style="font-size: 10px; color: #10b981;">V2 PRO</span></div>
+      <nav style="display: flex; gap: 20px;">
+        <a href="index.html" style="color: #a1a1aa; text-decoration: none; font-size: 14px;">App</a>
+        <a href="docs.html" style="color: #a1a1aa; text-decoration: none; font-size: 14px;">Docs</a>
+        <a href="whitepaper.html" style="color: #fff; text-decoration: none; font-size: 14px; font-weight: 600;">Whitepaper</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wp-wrapper">
+    <aside class="wp-sidebar no-print">
+      <h4 style="color: #71717a; font-size: 11px; text-transform: uppercase; margin-bottom: 20px;">Paper Sections</h4>
+      <a href="#summary" class="wp-toc-link">📖 1. Executive Summary</a>
+      <a href="#arch" class="wp-toc-link">⚙️ 2. Protocol Architecture</a>
+      <a href="#tiers" class="wp-toc-link">🌩️ 3. Referral Power Tiers</a>
+      <a href="#security" class="wp-toc-link">🛡️ 4. Security & Ethics</a>
+      <a href="#roadmap" class="wp-toc-link">🗺️ 5. Project Roadmap</a>
+      <a href="#tokenomics" class="wp-toc-link">💎 6. Tokenomics ($ZAP)</a>
+    </aside>
+
+    <main class="wp-content">
+      <section id="summary">
+        <h1>⚡ ZapApy V2 Pro: Whitepaper</h1>
+        <p>A decentralized yield aggregator built on the <strong>Base Network</strong>. Our mission is to democratize institutional lending through automation and a "Zero-Loss" referral economy.</p>
+      </section>
+
+      <section id="arch">
+        <h2>⚙️ 2. Protocol Architecture</h2>
+        <h3>The Zap Efficiency</h3>
+        <p>ZapApy reduces DeFi friction into a single transaction. We route USDC directly into <strong>Moonwell MetaMorpho</strong>, abstracting complexity while maximizing yield.</p>
+        <div class="highlight-card">
+          <strong>Key Innovation:</strong> On-chain calculations ensure APY rendering and profit-sharing are transparent and verifiable.
+        </div>
+      </section>
+
+      <section id="tiers">
+        <h2>🌩️ 3. Referral Power Tiers</h2>
+        <table class="stat-table">
+          <thead>
+            <tr><th>Tier Name</th><th>Min. Deposit</th><th>Commission Rate</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Lightning</strong></td><td>$5,000+ USDC</td><td>80% of Profits</td></tr>
+            <tr><td><strong>Thunder</strong></td><td>$1,000+ USDC</td><td>50% of Profits</td></tr>
+            <tr><td><strong>Surge</strong></td><td>$200+ USDC</td><td>30% of Profits</td></tr>
+            <tr><td><strong>Volt</strong></td><td>$100+ USDC</td><td>20% of Profits</td></tr>
+            <tr><td><strong>Spark</strong></td><td>$50+ USDC</td><td>10% of Profits</td></tr>
+          </tbody>
+        </table>
+        <p>Commission rates are determined by your personal <strong>Principal</strong>.</p>
+      </section>
+
+      <section id="roadmap">
+        <h2>🗺️ 5. Project Roadmap</h2>
+        <p>Our strategic growth plan for 2026 and beyond:</p>
+        <div class="highlight-card">
+          <h4>Phase 2: Expansion (Q3 2026)</h4>
+          <p>Launch of the $ZAP Token, Referral Leaderboards, and community governance voting.</p>
+        </div>
+        <div class="highlight-card">
+          <h4>Phase 3: Utility (Q4 2026)</h4>
+          <p>Activation of Tier Staking and the Protocol Buyback & Burn mechanism.</p>
+        </div>
+      </section>
+
+      <section id="tokenomics">
+        <h2>💎 6. Tokenomics ($ZAP)</h2>
+        <p>The $ZAP token rewards liquidity providers and active referrers. 45% of total supply is reserved for Community Rewards.</p>
+      </section>
+
+      <footer style="margin-top: 100px; text-align: center; color: #52525b; font-size: 11px;">
+        Official ZapApy V2 Pro Whitepaper • 2026
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
