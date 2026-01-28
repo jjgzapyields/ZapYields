@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>ZapApy V2 | Documentation</title>
+  <title>ZapApy V2 Pro | Whitepaper & Docs</title>
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/components.css" rel="stylesheet" type="text/css">
@@ -10,48 +10,66 @@
   <style>
     html { scroll-behavior: smooth; }
     * { box-sizing: border-box; }
-    body { background-color: #09090b; color: #e4e4e7; font-family: 'Inter', sans-serif; margin: 0; line-height: 1.6; }
+    body { background-color: #09090b; color: #e4e4e7; font-family: 'Inter', sans-serif; margin: 0; line-height: 1.8; }
     
-    .zy-header { background: rgba(9, 9, 11, 0.8); border-bottom: 1px solid #27272a; padding: 15px 0; width: 100%; position: relative; }
+    /* Header */
+    .zy-header { background: rgba(9, 9, 11, 0.9); border-bottom: 1px solid #27272a; padding: 20px 0; position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px); }
     .zy-inner { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-    .docs-wrapper { display: flex; max-width: 1200px; margin: 0 auto; width: 100%; padding: 0 20px; }
-    .toc-sidebar { display: none; }
+    
+    /* Layout */
+    .docs-wrapper { display: flex; max-width: 1200px; margin: 0 auto; width: 100%; padding: 40px 20px; gap: 40px; }
+    
+    /* Sidebar Navigation */
+    .toc-sidebar { width: 260px; position: sticky; top: 120px; align-self: flex-start; display: none; border-right: 1px solid rgba(255,255,255,0.05); padding-right: 20px; }
+    .toc-link { display: block; color: #a1a1aa; text-decoration: none; font-size: 14px; margin-bottom: 15px; padding-left: 10px; border-left: 2px solid transparent; transition: 0.2s; }
+    .toc-link:hover { color: #3b82f6; border-left: 2px solid #3b82f6; }
+    .toc-header { font-size: 11px; text-transform: uppercase; color: #71717a; margin-bottom: 20px; letter-spacing: 1px; font-weight: 700; }
 
-    .zy-main-container { padding: 40px 0; flex: 1; text-align: left; width: 100%; }
-    h1 { font-size: 28px; color: #fff; margin-bottom: 10px; scroll-margin-top: 40px; text-align: center; }
-    h2 { margin-top: 50px; color: #fff; font-size: 22px; border-bottom: 1px solid #27272a; padding-bottom: 15px; scroll-margin-top: 40px; }
-    h3 { color: #fff; margin-top: 30px; font-size: 18px; }
-    p { color: #a1a1aa; margin-bottom: 25px; font-size: 15px; }
+    /* Main Content */
+    .zy-main-container { flex: 1; min-width: 0; }
+    
+    h1 { font-size: 36px; color: #fff; margin-bottom: 10px; line-height: 1.2; }
+    .subtitle { color: #a1a1aa; font-size: 18px; margin-bottom: 50px; display: block; }
+    
+    h2 { font-size: 24px; color: #fff; margin-top: 60px; border-bottom: 1px solid #27272a; padding-bottom: 15px; scroll-margin-top: 100px; display: flex; align-items: center; gap: 10px; }
+    h3 { color: #fff; font-size: 18px; margin-top: 30px; margin-bottom: 15px; }
+    h4 { color: #3b82f6; font-size: 15px; margin: 20px 0 10px 0; }
+    p { color: #a1a1aa; margin-bottom: 20px; font-size: 15px; }
+    ul { color: #a1a1aa; margin-bottom: 20px; padding-left: 20px; }
+    li { margin-bottom: 10px; }
 
+    /* Components */
+    .docs-content-block { background: rgba(24, 24, 27, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); padding: 30px; border-radius: 16px; margin-top: 25px; backdrop-filter: blur(12px); }
+    .highlight-box { background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); padding: 20px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #3b82f6; }
+    
     /* Tier Grid */
-    .tier-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin: 30px 0; }
-    .tier-card { background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 25px; text-align: center; }
-    .tier-name { font-weight: 700; font-size: 14px; color: #fff; text-transform: uppercase; }
-    .tier-rate { font-size: 28px; color: #10b981; font-weight: 800; display: block; }
-    
-    /* Content Blocks */
-    .docs-content-block { background: rgba(24, 24, 27, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); padding: 25px; border-radius: 16px; margin-top: 20px; }
-    .tech-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+    .tier-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
+    .tier-card { background: rgba(24, 24, 27, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 20px 10px; text-align: center; }
+    .tier-name { font-weight: 700; font-size: 13px; color: #fff; text-transform: uppercase; display: block; margin-bottom: 5px; }
+    .tier-rate { font-size: 24px; color: #10b981; font-weight: 800; display: block; margin-bottom: 5px; }
+    .tier-req { font-size: 11px; color: #71717a; }
+
+    /* Technical Grid */
+    .tech-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
     .tech-item { background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 8px; border: 1px solid #27272a; }
-    .tech-label { font-size: 11px; text-transform: uppercase; color: #71717a; font-weight: bold; display: block; }
-    .tech-value { font-size: 14px; color: #e4e4e7; word-break: break-all; font-family: monospace; }
-    
-    .highlight-box { background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #3b82f6; }
-    pre { background: #18181b; padding: 15px; border-radius: 8px; overflow-x: auto; border: 1px solid #27272a; font-size: 13px; color: #3b82f6; white-space: pre-wrap; word-break: break-all; }
+    .tech-label { font-size: 11px; text-transform: uppercase; color: #71717a; font-weight: bold; display: block; margin-bottom: 4px; }
+    .tech-value { font-size: 14px; color: #e4e4e7; font-family: monospace; word-break: break-all; }
 
-    /* Roadmap UI */
-    .roadmap-list { list-style: none; padding: 0; }
-    .roadmap-step { margin-bottom: 25px; border-left: 2px solid #3b82f6; padding-left: 20px; }
-    .roadmap-step h4 { margin: 0; color: #fff; font-size: 16px; }
+    @media (min-width: 992px) { .toc-sidebar { display: block; } }
+    @media (max-width: 768px) { 
+      .tier-grid { grid-template-columns: 1fr; } 
+      .tech-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 28px; }
+    }
 
-    @media (min-width: 768px) {
-      h1 { text-align: left; font-size: 32px; }
-      .toc-sidebar { display: block; width: 250px; position: sticky; top: 40px; padding: 40px 20px 0 0; align-self: flex-start; }
-      .toc-link { display: block; color: #a1a1aa; text-decoration: none; font-size: 13px; margin-bottom: 12px; transition: 0.2s; }
-      .toc-link:hover { color: #3b82f6; }
-      .tier-grid { grid-template-columns: repeat(5, 1fr); }
-      .tech-grid { grid-template-columns: 1fr 1fr; }
-      .zy-main-container { padding: 40px 20px; }
+    /* Print Optimization */
+    @media print {
+      .toc-sidebar, .zy-header, footer { display: none !important; }
+      body { background: white !important; color: black !important; }
+      .docs-content-block, .tier-card, .tech-item { border: 1px solid #ddd !important; background: #fff !important; color: black !important; }
+      h1, h2, h3, h4, p, span, li { color: black !important; }
+      a { text-decoration: none; color: black !important; }
+      .docs-wrapper { display: block; padding: 0; }
     }
   </style>
 </head>
@@ -61,119 +79,114 @@
       <div class="zy-logo">ZapApy⚡ <span style="font-size: 10px; color: #10b981;">V2 PRO</span></div>
       <nav style="display: flex; gap: 20px;">
         <a href="index.html" style="color: #a1a1aa; text-decoration: none; font-size: 14px;">App</a>
-        <a href="docs.html" style="color: #fff; text-decoration: none; font-size: 14px; font-weight: 600;">Docs</a>
+        <a href="docs.html" style="color: #fff; text-decoration: none; font-size: 14px; font-weight: 600;">Whitepaper</a>
       </nav>
     </div>
   </header>
 
   <div class="docs-wrapper">
     <aside class="toc-sidebar">
-      <h4 style="font-size: 11px; text-transform: uppercase; color: #71717a; margin-bottom: 15px;">Navigation</h4>
-      <a href="#overview" class="toc-link">📖 Overview</a>
-      <a href="#tiers" class="toc-link">🌩️ Power Tiers</a>
-      <a href="#mechanics" class="toc-link">⚙️ Mechanics</a>
-      <a href="#roadmap" class="toc-link">🗺️ Roadmap</a>
-      <a href="#tokenomics" class="toc-link">💎 Tokenomics</a>
-      <a href="#technicals" class="toc-link">🖥️ Technicals</a>
+      <div class="toc-header">Table of Contents</div>
+      <a href="#executive" class="toc-link">1. Executive Summary</a>
+      <a href="#problem" class="toc-link">2. Market Problem</a>
+      <a href="#solution" class="toc-link">3. The Solution</a>
+      <a href="#tiers" class="toc-link">4. Power Tier System</a>
+      <a href="#security" class="toc-link">5. Security & Safety</a>
+      <a href="#tokenomics" class="toc-link">6. Tokenomics ($ZAP)</a>
+      <a href="#roadmap" class="toc-link">7. Roadmap</a>
+      <a href="#legal" class="toc-link">8. Legal Disclaimer</a>
     </aside>
 
     <main class="zy-main-container">
-      <section id="overview">
-        <h1>📖 Overview</h1>
-        <p>ZapApy V2 Pro is a decentralized yield aggregator built on the <strong>Base Network</strong>. It provides a simplified "Zap" interface into <strong>Moonwell MetaMorpho</strong> vaults, abstracting complex DeFi interactions into single-click efficiency.</p>
+      <section id="executive">
+        <h1>ZapApy V2 Pro Whitepaper</h1>
+        <span class="subtitle">The First Wealth-Sharing Yield Aggregator on Base</span>
+        <div class="docs-content-block">
+          <p><strong>ZapApy V2 Pro</strong> is a decentralized yield aggregator built on Coinbase’s <strong>Base Network</strong>. It solves two critical problems in the current DeFi landscape: the complexity of accessing institutional-grade lending pools and the lack of sustainable referral systems.</p>
+          <p>By abstracting complex smart contracts into a single "Zap" transaction, we allow users to deploy USDC directly into <strong>Moonwell MetaMorpho</strong> vaults while earning up to <strong>80% commission</strong> through our proprietary referral engine.</p>
+        </div>
+      </section>
+
+      <section id="problem">
+        <h2>📉 2. Market Problem</h2>
+        <div class="docs-content-block">
+          <h3>2.1 The Friction of Yield</h3>
+          <p>To earn a competitive APY in 2026, a user typically must bridge, swap, approve, deposit, and manually compound. This results in high gas fees and user drop-off.</p>
+          <h3>2.2 The Referral Dilemma</h3>
+          <p>Traditional referral models are flawed. They either tax the new user's deposit (Ponzi-nomics) or offer insignificant rewards that fail to attract professional marketers.</p>
+        </div>
+      </section>
+
+      <section id="solution">
+        <h2>💡 3. The Solution</h2>
+        <div class="docs-content-block">
+          <h3>3.1 One-Click "Zap" Architecture</h3>
+          <p>ZapApy V2 Pro aggregates liquidity via a simplified interface. Users approve USDC, and the protocol handles the routing, batching, and auto-compounding into Moonwell’s MetaMorpho vaults.</p>
+          
+          <div class="highlight-box">
+            <strong>The Zero-Loss Guarantee:</strong> We operate on a strict principal protection mandate. Commissions are paid <em>only</em> from generated profit. The recruit never loses their initial capital.
+          </div>
+        </div>
       </section>
 
       <section id="tiers">
-        <h2>🌩️ Power Tiers (Multiplied Income)</h2>
-        <p>Your referral commission rate is determined by your personal <strong>Principal</strong> deposit. As your skin in the game grows, so does your share of the network's success.</p>
-        
+        <h2>🌩️ 4. The Power Tier System</h2>
+        <p>A referrer's commission rate is determined by their own "Skin in the Game" (Personal Deposit).</p>
         <div class="tier-grid">
-          <div class="tier-card"><span class="tier-name">Spark</span><span class="tier-rate">10%</span><span style="font-size:11px;color:#71717a;">$50+</span></div>
-          <div class="tier-card"><span class="tier-name">Volt</span><span class="tier-rate">20%</span><span style="font-size:11px;color:#71717a;">$100+</span></div>
-          <div class="tier-card"><span class="tier-name">Surge</span><span class="tier-rate">30%</span><span style="font-size:11px;color:#71717a;">$200+</span></div>
-          <div class="tier-card"><span class="tier-name">Thunder</span><span class="tier-rate">50%</span><span style="font-size:11px;color:#71717a;">$1k+</span></div>
-          <div class="tier-card"><span class="tier-name">Lightning</span><span class="tier-rate">80%</span><span style="font-size:11px;color:#71717a;">$5k+</span></div>
-        </div>
-
-        <div class="docs-content-block">
-          <div style="margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;">
-            <h4 style="color: #10b981; margin: 0;">⚡ Lightning (80% Commission)</h4>
-            <p style="font-size: 14px; margin: 5px 0;"><strong>The Whale Status.</strong> Designed for heavy liquidity providers and professional marketers. At this level, you keep nearly all the profit generated by your recruits, effectively acting as your own yield-farming house.</p>
-          </div>
-          <div style="margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;">
-            <h4 style="color: #3b82f6; margin: 0;">🌩️ Thunder (50% Commission)</h4>
-            <p style="font-size: 14px; margin: 5px 0;"><strong>The Professional.</strong> A balanced tier for dedicated community builders. Splitting profits 50/50 with the protocol ensures high-velocity growth for your wallet while supporting the ecosystem.</p>
-          </div>
-          <div style="margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;">
-            <h4 style="color: #60a5fa; margin: 0;">🌊 Surge (30% Commission)</h4>
-            <p style="font-size: 14px; margin: 5px 0;"><strong>The Power User.</strong> Ideal for those moving beyond casual zapping. This tier offers a significant jump in earnings, rewarding mid-range liquidity with a competitive edge.</p>
-          </div>
-          <div style="margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;">
-            <h4 style="color: #93c5fd; margin: 0;">🔋 Volt (20% Commission)</h4>
-            <p style="font-size: 14px; margin: 5px 0;"><strong>The Enthusiast.</strong> Doubling the base commission, the Volt tier is the first major step in building a passive income stream through the referral network.</p>
-          </div>
-          <div>
-            <h4 style="color: #bfdbfe; margin: 0;">✨ Spark (10% Commission)</h4>
-            <p style="font-size: 14px; margin: 5px 0;"><strong>The Catalyst.</strong> Your introduction to the ZapApy ecosystem. Even with a small deposit, you gain a foothold in the network and start earning above the default rate.</p>
-          </div>
+          <div class="tier-card"><span class="tier-name">Spark</span><span class="tier-rate">10%</span><span class="tier-req">$50+</span></div>
+          <div class="tier-card"><span class="tier-name">Volt</span><span class="tier-rate">20%</span><span class="tier-req">$100+</span></div>
+          <div class="tier-card"><span class="tier-name">Surge</span><span class="tier-rate">30%</span><span class="tier-req">$200+</span></div>
+          <div class="tier-card"><span class="tier-name">Thunder</span><span class="tier-rate">50%</span><span class="tier-req">$1k+</span></div>
+          <div class="tier-card"><span class="tier-name">Lightning</span><span class="tier-rate">80%</span><span class="tier-req">$5k+</span></div>
         </div>
       </section>
 
-      <section id="mechanics">
-        <h2>⚙️ Core Protocol Mechanics</h2>
+      <section id="security">
+        <h2>🛡️ 5. Security & Sustainability</h2>
         <div class="docs-content-block">
-          <h3>🛡️ Zero-Loss Principal</h3>
-          <p>User deposits are never taxed. All commissions are paid out <strong>strictly from generated profit</strong>. Your capital is 100% protected at all times.</p>
-          <h3>⏳ 76-Hour Loyalty Lock</h3>
-          <p>Standard exit is available after 76 hours. Early exit triggers a <strong>1% Early-Exit Penalty</strong> on the total balance.</p>
-        </div>
-      </section>
-
-      <section id="roadmap">
-        <h2>🗺️ Project Roadmap</h2>
-        <div class="docs-content-block">
-          <div class="roadmap-list">
-            <div class="roadmap-step">
-              <h4>Phase 1: Foundation (Live)</h4>
-              <p style="font-size: 13px;">Mainnet deployment on Base, Tier system activation, and Security verification.</p>
-            </div>
-            <div class="roadmap-step">
-              <h4>Phase 2: Expansion (Q3 2026)</h4>
-              <p style="font-size: 13px;">Referral Leaderboards and the $ZAP Token Generation Event (TGE).</p>
-            </div>
-            <div class="roadmap-step">
-              <h4>Phase 3: Utility (Q4 2026)</h4>
-              <p style="font-size: 13px;">Staking utility for Tier overrides and Buyback & Burn mechanism launch.</p>
-            </div>
-          </div>
+          <h3>5.1 The 76-Hour Loyalty Lock</h3>
+          <p>To prevent "Vampire Attacks" from bots, we enforce a 76-hour soft lock on deposits.</p>
+          <ul>
+            <li><strong>Standard Exit:</strong> Free withdrawal after 76 hours.</li>
+            <li><strong>Penalty Exit:</strong> 1% fee on total balance if withdrawn early.</li>
+          </ul>
+          <h3>5.2 Smart Contract Security</h3>
+          <p>Built on OpenZeppelin’s <code>SafeERC20</code> and <code>ReentrancyGuard</code> standards. All contracts are verified on BaseScan.</p>
         </div>
       </section>
 
       <section id="tokenomics">
-        <h2>💎 Tokenomics ($ZAP)</h2>
+        <h2>💎 6. Tokenomics ($ZAP)</h2>
         <div class="docs-content-block">
+          <p>The <strong>$ZAP</strong> token captures value from the protocol's TVL. Launching Q3 2026.</p>
           <div class="tech-grid">
             <div class="tech-item"><span class="tech-label">Community Rewards</span><span class="tech-value">45%</span></div>
-            <div class="tech-item"><span class="tech-label">Liquidity Pool</span><span class="tech-value">20%</span></div>
-            <div class="tech-item"><span class="tech-label">Team & Dev</span><span class="tech-value">15%</span></div>
+            <div class="tech-item"><span class="tech-label">Liquidity (Locked)</span><span class="tech-value">20%</span></div>
+            <div class="tech-item"><span class="tech-label">Team (Vested)</span><span class="tech-value">15%</span></div>
             <div class="tech-item"><span class="tech-label">Treasury</span><span class="tech-value">10%</span></div>
+            <div class="tech-item"><span class="tech-label">Seed Round</span><span class="tech-value">10%</span></div>
           </div>
-          <div class="highlight-box">
-            <strong>Utility:</strong> Staking $ZAP will allow users to reach the ⚡ Lightning Tier with a lower USDC deposit.
-          </div>
+          <p style="margin-top: 15px; font-size: 13px;">*Holders of $ZAP will be able to override Tier requirements (e.g., reach Lightning Tier with lower USDC).</p>
         </div>
       </section>
 
-      <section id="technicals">
-        <h2>🖥️ Smart Contract Technicals</h2>
-        <div class="tech-grid">
-          <div class="tech-item"><span class="tech-label">Network</span><span class="tech-value">Base Mainnet (8453)</span></div>
-          <div class="tech-item"><span class="tech-label">USDC Address</span><span class="tech-value">0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</span></div>
-          <div class="tech-item"><span class="tech-label">Vault Provider</span><span class="tech-value">Moonwell MetaMorpho (mUSDC)</span></div>
+      <section id="roadmap">
+        <h2>🗺️ 7. Roadmap</h2>
+        <div class="docs-content-block">
+          <ul>
+            <li><strong>Phase 1 (Live):</strong> Base Mainnet Launch, Web Interface, 5-Tier System.</li>
+            <li><strong>Phase 2 (Q2 2026):</strong> Referral Leaderboard, Influencer Campaign, New Vaults.</li>
+            <li><strong>Phase 3 (Q3 2026):</strong> Token Generation Event (TGE), Staking, Buyback & Burn.</li>
+          </ul>
         </div>
       </section>
 
-      <footer style="margin-top: 60px; text-align: center; color: #52525b; font-size: 11px;">
+      <section id="legal">
+        <h2>⚖️ 8. Legal Disclaimer</h2>
+        <p style="font-size: 12px; opacity: 0.7;">ZapApy V2 Pro is a decentralized software tool. It is not a bank, and it does not offer securities. Users interact with the protocol at their own risk. While the code is audited and verified, DeFi involves inherent risks including smart contract bugs and market volatility. The "Zero-Loss" guarantee refers to the calculation of referral fees and does not guarantee against underlying protocol failures (e.g., Moonwell/USDC de-pegging).</p>
+      </section>
+
+      <footer style="margin-top: 80px; text-align: center; color: #52525b; font-size: 11px; padding-bottom: 40px;">
         ZapApy V2 Pro • 2026 • Verified on BaseScan
       </footer>
     </main>
