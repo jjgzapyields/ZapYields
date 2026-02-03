@@ -26,14 +26,19 @@
         <span class="label">Your Balance</span>
         <div class="value" id="userBalance">---</div>
       </div>
+      
       <div class="glass-card">
-        <span class="label">Current Tier</span>
-        <div class="value" style="color: #3b82f6;" id="userTier">Spark ⚡</div>
-        <div class="sub-value">10% Commission</div>
-      </div>
-      <div class="glass-card">
-        <span class="label">Your Referral ID</span>
-        <div class="value" style="color: #10b981;" id="myRefId">---</div>
+        <span class="label">Your Referral Code</span>
+        <div class="referral-box">
+          <div class="value" style="color: #10b981;" id="myRefCode">---</div>
+          
+          <button id="copyBtn" class="icon-btn" onclick="copyToClipboard()" style="display:none;" title="Copy Code">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </button>
+        </div>
         <div class="sub-value" id="idStatus">Connect to check</div>
       </div>
     </div>
@@ -41,9 +46,9 @@
     <div class="glass-card main-action">
       <h2>⚡ Zap Liquidity</h2>
       
-      <div id="generateSection" class="alert-box" style="display:none; text-align:center;">
-        <p>You don't have a Referral ID yet.</p>
-        <button onclick="createReferralId()" class="secondary-btn">Generate My ID</button>
+      <div id="generateSection" class="alert-box" style="display:none;">
+        <p>You need a unique code to refer others.</p>
+        <button onclick="createReferralCode()" class="secondary-btn">Generate My Code</button>
       </div>
 
       <div class="input-group">
@@ -52,12 +57,12 @@
       </div>
 
       <div class="input-group">
-        <label>Referrer ID (Required)</label>
-        <input type="number" id="referrerId" placeholder="e.g. 1005">
+        <label>Referral Code (Optional)</label>
+        <input type="text" id="referrerCode" placeholder="e.g. K9X2M4P" style="text-transform: uppercase;">
       </div>
 
       <div class="safety-badge">
-        🔒 <strong>Anti-Drain Protection:</strong> We only approve the exact amount you enter.
+        🔒 <strong>Anti-Drain:</strong> We only approve the exact amount you enter.
       </div>
 
       <button onclick="zapIn()" class="primary-btn">Approve & Zap In</button>
