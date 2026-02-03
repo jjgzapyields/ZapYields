@@ -61,4 +61,84 @@
     </main>
   </div>
 </body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ZapApy V2 Pro | Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Docs Specific Overrides */
+    .doc-layout { display: flex; gap: 40px; }
+    .sidebar { width: 250px; flex-shrink: 0; position: sticky; top: 100px; height: fit-content; }
+    .sidebar a { display: block; color: #a1a1aa; text-decoration: none; padding: 8px 0; border-bottom: 1px solid #222; font-size: 14px; }
+    .tier-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 20px; }
+    .tier-card { background: rgba(24,24,27,0.8); padding: 15px; text-align: center; border-radius: 12px; border: 1px solid #333; }
+    @media (max-width: 768px) { .doc-layout { flex-direction: column; } .tier-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  
+  <header class="zy-header">
+    <div class="zy-inner">
+      <div class="logo">ZapApy⚡ <span style="color:#10b981; font-size:10px;">DOCS</span></div>
+      <nav>
+        <a href="index.html">App</a>
+        <a href="docs.html" class="active">Docs</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrapper doc-layout">
+    <aside class="sidebar">
+      <h4 style="color:#71717a; text-transform:uppercase; font-size:11px; margin-bottom:15px;">Navigation</h4>
+      <a href="#intro">📖 Executive Summary</a>
+      <a href="#tiers">🌩️ Power Tiers</a>
+      <a href="#security">🛡️ Security</a>
+      <a href="#tokenomics">💎 Tokenomics</a>
+    </aside>
+
+    <main class="doc-content" style="flex:1;">
+      <section id="intro">
+        <h1>ZapApy V2 Pro: Whitepaper</h1>
+        <div class="glass-card">
+          <p>The first Wealth-Sharing Yield Aggregator on Base. We abstract institutional lending into a single transaction while offering a "Zero-Loss" referral economy.</p>
+        </div>
+      </section>
+
+      <section id="tiers" style="margin-top:60px;">
+        <h2>🌩️ Power Tiers</h2>
+        <div class="tier-grid">
+          <div class="tier-card"><span style="color:#10b981; font-weight:bold; display:block;">Lightning</span><span style="font-size:20px; font-weight:800; color:#fff;">80%</span><small style="color:#71717a;">$5k+</small></div>
+          <div class="tier-card"><span style="color:#3b82f6; font-weight:bold; display:block;">Thunder</span><span style="font-size:20px; font-weight:800; color:#fff;">50%</span><small style="color:#71717a;">$1k+</small></div>
+          <div class="tier-card"><span style="color:#60a5fa; font-weight:bold; display:block;">Surge</span><span style="font-size:20px; font-weight:800; color:#fff;">30%</span><small style="color:#71717a;">$200+</small></div>
+          <div class="tier-card"><span style="color:#93c5fd; font-weight:bold; display:block;">Volt</span><span style="font-size:20px; font-weight:800; color:#fff;">20%</span><small style="color:#71717a;">$100+</small></div>
+          <div class="tier-card"><span style="color:#bfdbfe; font-weight:bold; display:block;">Spark</span><span style="font-size:20px; font-weight:800; color:#fff;">10%</span><small style="color:#71717a;">$50+</small></div>
+        </div>
+      </section>
+
+      <section id="security" style="margin-top:60px;">
+        <h2>🛡️ Security Architecture</h2>
+        <div class="glass-card">
+          <h3>No-Fee Principal</h3>
+          <p>We never tax user deposits. Commissions are paid strictly from generated yield profits.</p>
+          <h3>76-Hour Loyalty Lock</h3>
+          <p>Withdrawals before 76 hours incur a 1% penalty to prevent flash-loan attacks.</p>
+        </div>
+      </section>
+
+      <section id="tokenomics" style="margin-top:60px;">
+        <h2>💎 Tokenomics ($ZAP)</h2>
+        <div class="glass-card">
+          <p>Target Launch: Q3 2026. 45% of supply is reserved for Community Rewards.</p>
+        </div>
+      </section>
+      
+      <footer style="margin-top: 80px; text-align: center; color: #52525b; font-size: 11px;">
+        ZapApy V2 Pro • 2026
+      </footer>
+    </main>
+  </div>
+</body>
 </html>

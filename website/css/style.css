@@ -26,7 +26,7 @@ nav a:hover, nav a.active { color: #fff; }
 
 /* Buttons */
 .connect-btn { background: #3b82f6; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-.primary-btn { width: 100%; background: #10b981; color: #000; font-weight: 800; border: none; padding: 14px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+.primary-btn { width: 100%; background: #10b981; color: #000; font-weight: 800; border: none; padding: 14px; border-radius: 8px; cursor: pointer; transition: 0.2s; margin-top: 10px; }
 .primary-btn:hover { opacity: 0.9; }
 .secondary-btn { background: #3b82f6; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
 
@@ -55,20 +55,6 @@ nav a:hover, nav a.active { color: #fff; }
   padding: 12px; border-radius: 8px; color: #fff; font-size: 16px;
 }
 
-/* Alert Boxes */
+/* Components */
 .alert-box { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
 .safety-badge { background: rgba(255, 193, 7, 0.1); color: #fbbf24; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 20px; border: 1px solid rgba(255, 193, 7, 0.2); }
-
-/* Docs Specific */
-.doc-layout { display: flex; gap: 40px; }
-.sidebar { width: 250px; flex-shrink: 0; }
-.sidebar a { display: block; color: #a1a1aa; text-decoration: none; padding: 8px 0; border-bottom: 1px solid #222; }
-.tier-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 20px; }
-.tier { text-align: center; padding: 15px; }
-.tier span { display: block; font-size: 11px; text-transform: uppercase; color: #a1a1aa; }
-.tier strong { display: block; font-size: 20px; color: #10b981; }
-
-@media (max-width: 768px) {
-  .doc-layout { flex-direction: column; }
-  .tier-grid { grid-template-columns: 1fr; }
-}
