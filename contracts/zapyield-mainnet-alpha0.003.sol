@@ -20,7 +20,7 @@ contract ZapYieldsMainnetLive is Ownable, ReentrancyGuard {
     IERC20 public constant USDC = IERC20(0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913); 
     
     // MOONWELL METAMORPHO VAULT (BASE MAINNET)
-    IMorphoVault public constant mUSDC = IMorphoVault(0xc1256Ae5FF1cF2719D4937aDb3bBCCaB2e00a2cA); 
+    IMorphoVault public constant mUSDC = IMorphoVault(0xc1256Ae5FF1cf2719D4937adb3bbCCab2E00A2Ca);
 
     uint256 public constant MIN_INVESTMENT = 10 * 1e6; 
 

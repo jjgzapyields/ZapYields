@@ -1,0 +1,45 @@
+{
+	"compiler": {
+		"version": "0.8.20+commit.a1b79de6"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/zapyield-mainnet-alpha0.002.sol": "Address"
+		},
+		"evmVersion": "shanghai",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/zapyield-mainnet-alpha0.002.sol": {
+			"keccak256": "0xe04667e37b6a0c723c2788e147094298fc91ef98ff7a0d0fc383ac4a04412841",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6e8c5e22a8805d2a4346cf42322761df8093a0c20807e632612b3180080b79f1",
+				"dweb:/ipfs/QmY9wCU5GUczwuGvi7U4F5jxuFLLnAugH6nj5sgDLbesVX"
+			]
+		}
+	},
+	"version": 1
+}
