@@ -5,7 +5,7 @@
   <title>ZapApy V2 Pro | Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/style.css">
-  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 </head>
 <body>
   
@@ -24,7 +24,7 @@
     <div class="stats-grid">
       <div class="glass-card">
         <span class="label">Your Balance</span>
-        <div class="value" id="userBalance">$0.00</div>
+        <div class="value" id="userBalance">---</div>
       </div>
       <div class="glass-card">
         <span class="label">Current Tier</span>
@@ -57,7 +57,7 @@
       </div>
 
       <div class="safety-badge">
-        🔒 <strong>Anti-Drain:</strong> We only approve the exact amount you enter.
+        🔒 <strong>Anti-Drain Protection:</strong> We only approve the exact amount you enter.
       </div>
 
       <button onclick="zapIn()" class="primary-btn">Approve & Zap In</button>
