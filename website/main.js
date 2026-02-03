@@ -1,153 +1,118 @@
-const VAULT_ADDR = "0x971aEa41fb10bED7613838B1ad730b6B33494969"; 
-const USDC_ADDR = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+// CONFIGURATION
+const PROXY_ADDRESS = "0x971aEa41fb10bED7613838B1ad730b6B33494969"; // <--- PASTE YOUR DEPLOYED PROXY ADDRESS!
+const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"; // Base Mainnet USDC
 
-const V_ABI = [
-  "function zapIn(uint256 a, address r) external",
-  "function zapOut() external",
-  "function getAccountValue(address u) view returns (uint256)",
-  "function users(address) view returns (uint256 p, uint256 s, address ref, uint256 earn, uint256 time)",
-  "event ZapIn(address indexed user, uint256 amount, address indexed referrer)"
+// ABIs (Only what we need)
+const CONTRACT_ABI = [
+  "function zapIn(uint256 amount, uint256 referrerId) external",
+  "function createReferralId() external",
+  "function getMyId() external view returns (uint256)",
+  "function userInfo(address) external view returns (uint256, uint256, address)"
 ];
-const U_ABI = ["function approve(address s, uint256 a) public returns (bool)"];
-
-const TIERS = [
-  { name: "Spark", min: 50 },
-  { name: "Volt", min: 100 },
-  { name: "Surge", min: 200 },
-  { name: "Thunder", min: 1000 },
-  { name: "Lightning", min: 5000 }
+const USDC_ABI = [
+  "function approve(address spender, uint256 amount) external returns (bool)",
+  "function allowance(address owner, address spender) external view returns (uint256)",
+  "function balanceOf(address account) external view returns (uint256)"
 ];
 
-let signer, provider, vault, usdc, tickerInterval;
-
-window.onload = () => {
-  document.getElementById('connectBtn').onclick = connectWallet;
-  document.getElementById('disconnectBtn').onclick = disconnectWallet;
-  document.getElementById('approveBtn').onclick = handleApprove;
-  document.getElementById('zapInBtn').onclick = handleZapIn;
-  document.getElementById('zapOutBtn').onclick = handleZapOut;
-  document.getElementById('copyRefBtn').onclick = copyReferral;
-
-  if (window.ethereum && localStorage.getItem('isWalletConnected') === 'true') {
-    connectWallet();
-  }
-};
+let provider, signer, contract, usdcContract, userAddress;
 
 async function connectWallet() {
+  if (!window.ethereum) return alert("Please install MetaMask!");
+  
   try {
-    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    provider = new ethers.providers.Web3Provider(window.ethereum);
     await provider.send("eth_requestAccounts", []);
-    const { chainId } = await provider.getNetwork();
-    if (chainId !== 8453) await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: "0x2105" }] });
     signer = provider.getSigner();
-    const addr = await signer.getAddress();
-    setupSession(addr);
-  } catch (err) { updateStatus("Connection Failed", true); }
-}
+    userAddress = await signer.getAddress();
+    
+    // Switch to Base Chain (ID: 8453)
+    const { chainId } = await provider.getNetwork();
+    if (chainId !== 8453) {
+      alert("Please switch your wallet to Base Network!");
+      return;
+    }
 
-async function setupSession(addr) {
-  vault = new ethers.Contract(VAULT_ADDR, V_ABI, signer);
-  usdc = new ethers.Contract(USDC_ADDR, U_ABI, signer);
-  localStorage.setItem('isWalletConnected', 'true');
-  document.getElementById('connectBtn').classList.add('hidden');
-  document.getElementById('disconnectBtn').classList.remove('hidden');
-  refreshStats(addr);
-}
+    // Init Contracts
+    contract = new ethers.Contract(PROXY_ADDRESS, CONTRACT_ABI, signer);
+    usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, signer);
 
-async function refreshStats(addr) {
-  try {
-    const bal = await vault.getAccountValue(addr);
-    const userData = await vault.users(addr);
-    const principal = parseFloat(ethers.utils.formatUnits(userData.p, 6));
-    const currentVal = parseFloat(ethers.utils.formatUnits(bal, 6));
-    const liveApy = 9.10; 
-
-    document.getElementById('principalDisplay').innerText = principal.toFixed(2);
-    document.getElementById('refEarningsDisplay').innerText = parseFloat(ethers.utils.formatUnits(userData.earn, 6)).toFixed(4);
-    if (principal > 0) document.getElementById('zapOutBtn').classList.remove('disabled-btn');
-
-    // Update Tier Bar
-    updateTierProgress(principal);
-
-    const growthPerSec = (currentVal * (liveApy / 100)) / 31536000;
-    document.getElementById('perSecondDisplay').innerText = growthPerSec.toFixed(8);
-    let liveVal = currentVal;
-    clearInterval(tickerInterval);
-    tickerInterval = setInterval(() => {
-      liveVal += (growthPerSec / 20);
-      document.getElementById('yieldDisplay').innerText = liveVal.toFixed(6);
-    }, 50);
-  } catch (e) { console.error(e); }
-}
-
-function updateTierProgress(principal) {
-  let currentTierIndex = -1;
-  for (let i = 0; i < TIERS.length; i++) {
-    if (principal >= TIERS[i].min) currentTierIndex = i;
-  }
-  const nextTier = TIERS[currentTierIndex + 1];
-  const bar = document.getElementById('tierProgressBar');
-  const label = document.getElementById('nextTierLabel');
-  const percentLabel = document.getElementById('tierPercent');
-
-  if (nextTier) {
-    const prevMin = currentTierIndex === -1 ? 0 : TIERS[currentTierIndex].min;
-    const progress = ((principal - prevMin) / (nextTier.min - prevMin)) * 100;
-    bar.style.width = `${Math.min(progress, 100)}%`;
-    label.innerText = `Next Tier: ${nextTier.name} ($${nextTier.min})`;
-    percentLabel.innerText = `${Math.floor(progress)}%`;
-  } else {
-    bar.style.width = "100%";
-    label.innerText = "MAX TIER REACHED ⚡";
-    percentLabel.innerText = "100%";
+    // Update UI
+    document.getElementById("connectBtn").innerText = userAddress.slice(0,6) + "..." + userAddress.slice(-4);
+    
+    // Load Data
+    checkMyId();
+    updateBalance();
+    
+  } catch (err) {
+    console.error(err);
+    alert("Connection Failed");
   }
 }
 
-async function handleZapOut() {
-  const addr = await signer.getAddress();
-  const userData = await vault.users(addr);
-  const lockPeriod = 76 * 3600; 
-  if (Math.floor(Date.now() / 1000) - userData.time.toNumber() < lockPeriod) {
-    const modal = document.getElementById('warningModal');
-    modal.style.display = 'flex';
-    document.getElementById('confirmZapOut').onclick = () => { modal.style.display = 'none'; executeZapOut(); };
-    document.getElementById('cancelZapOut').onclick = () => { modal.style.display = 'none'; };
-  } else { executeZapOut(); }
-}
-
-async function executeZapOut() {
+async function checkMyId() {
   try {
-    updateStatus("Withdrawing...", false);
-    const tx = await vault.zapOut({ gasLimit: 500000 });
-    await tx.wait();
-    location.reload();
-  } catch (e) { updateStatus("Error", true); }
+    const id = await contract.getMyId();
+    if (id.toString() !== "0") {
+      document.getElementById("myRefId").innerText = "#" + id.toString();
+      document.getElementById("idStatus").innerText = "Active";
+      document.getElementById("generateSection").style.display = "none";
+    } else {
+      document.getElementById("myRefId").innerText = "None";
+      document.getElementById("idStatus").innerText = "Generate below";
+      document.getElementById("generateSection").style.display = "block";
+    }
+  } catch (err) { console.log("New User"); }
 }
 
-async function handleApprove() {
-  const val = document.getElementById('amountInput').value;
+async function createReferralId() {
   try {
-    const tx = await usdc.approve(VAULT_ADDR, ethers.utils.parseUnits(val, 6));
+    const tx = await contract.createReferralId();
+    document.getElementById("idStatus").innerText = "Generating...";
     await tx.wait();
-    document.getElementById('zapInBtn').classList.remove('disabled-btn');
-  } catch (e) { updateStatus("Fail", true); }
+    checkMyId();
+    alert("Referral ID Generated! ⚡");
+  } catch (err) {
+    alert("Error: " + (err.reason || err.message));
+  }
 }
 
-async function handleZapIn() {
-  const val = document.getElementById('amountInput').value;
-  const ref = new URLSearchParams(window.location.search).get('ref') || "0x0000000000000000000000000000000000000000";
+async function updateBalance() {
   try {
-    const tx = await vault.zapIn(ethers.utils.parseUnits(val, 6), ref, { gasLimit: 300000 });
-    await tx.wait();
-    location.reload();
-  } catch (e) { updateStatus("Fail", true); }
+    const bal = await usdcContract.balanceOf(userAddress);
+    document.getElementById("userBalance").innerText = "$" + ethers.utils.formatUnits(bal, 6);
+  } catch (e) {}
 }
 
-async function copyReferral() {
-  const addr = await signer.getAddress();
-  navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?ref=${addr}`);
-  alert("Link Copied!");
-}
+async function zapIn() {
+  const amount = document.getElementById("zapAmount").value;
+  const refId = document.getElementById("referrerId").value;
 
-function disconnectWallet() { localStorage.setItem('isWalletConnected', 'false'); location.reload(); }
-function updateStatus(m, e) { const s = document.getElementById('statusLabel'); s.innerText = m; s.className = e ? "status-msg status-error" : "status-msg"; }
+  if (!amount || !refId) return alert("Please enter Amount and Referrer ID.");
+
+  try {
+    const amountWei = ethers.utils.parseUnits(amount, 6); // USDC has 6 decimals
+
+    // 1. Check Allowance
+    const allowance = await usdcContract.allowance(userAddress, PROXY_ADDRESS);
+    
+    if (allowance.lt(amountWei)) {
+      // 2. Approve EXACT Amount (Anti-Drainer)
+      const approveTx = await usdcContract.approve(PROXY_ADDRESS, amountWei);
+      alert("Approving USDC... Please wait.");
+      await approveTx.wait();
+    }
+
+    // 3. Zap In
+    const zapTx = await contract.zapIn(amountWei, refId);
+    alert("Zapping In... ⚡");
+    await zapTx.wait();
+    
+    alert("Success! Liquidity Deposited.");
+    updateBalance();
+    
+  } catch (err) {
+    console.error(err);
+    alert("Transaction Failed: " + (err.reason || err.message));
+  }
+}
