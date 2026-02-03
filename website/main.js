@@ -1,5 +1,5 @@
 // --- CONFIGURATION ---
-const PROXY_ADDRESS = "0x8b0eb44Bb39239Ed852d2bCE54157f2DA0d6c08F"; // <--- PASTE NEW CONTRACT ADDRESS
+const PROXY_ADDRESS = "0x555FA27c3807D744daCB08AE6821645A7c380eC4"; // <--- PASTE NEW CONTRACT ADDRESS
 const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"; // Base USDC
 
 // --- ABI ---
@@ -20,7 +20,7 @@ const USDC_ABI = [
 
 let provider, signer, contract, usdcContract, userAddress;
 
-// 1. Connect Wallet (The Main Function)
+// 1. Connect Wallet (Auto-Connect Support)
 async function connectWallet(silent = false) {
   if (typeof window.ethereum === 'undefined') {
     if (!silent) alert("MetaMask not found!");
@@ -30,10 +30,9 @@ async function connectWallet(silent = false) {
   try {
     provider = new ethers.providers.Web3Provider(window.ethereum);
     
-    // Request accounts (if silent=true, this usually returns immediately if already connected)
+    // Request accounts
     const accounts = await provider.send("eth_requestAccounts", []);
-    
-    if (accounts.length === 0) return; // No accounts found
+    if (accounts.length === 0) return;
 
     signer = provider.getSigner();
     userAddress = await signer.getAddress();
@@ -49,7 +48,6 @@ async function connectWallet(silent = false) {
           });
         } catch(e) { return alert("Please switch wallet to Base Network."); }
       } else {
-        // If silent and wrong network, stop here (don't error out, just don't connect UI yet)
         return; 
       }
     }
@@ -60,9 +58,8 @@ async function connectWallet(silent = false) {
     // Update UI
     document.getElementById("connectBtn").innerText = userAddress.slice(0,6) + "...";
     document.getElementById("connectBtn").style.background = "#27272a";
-    document.getElementById("connectBtn").style.border = "1px solid #10b981"; // Green border to show connected status
+    document.getElementById("connectBtn").style.border = "1px solid #10b981"; 
     
-    // Load Data
     refreshData();
     setupEventListeners();
 
@@ -71,7 +68,7 @@ async function connectWallet(silent = false) {
   }
 }
 
-// 2. Central Refresh Function
+// 2. Central Refresh
 async function refreshData() {
   await Promise.all([
     checkMyCode(),
@@ -79,7 +76,7 @@ async function refreshData() {
   ]);
 }
 
-// 3. Setup Live Listeners
+// 3. Listeners
 function setupEventListeners() {
   if (!contract || !usdcContract) return;
 
@@ -91,14 +88,9 @@ function setupEventListeners() {
     if (user.toLowerCase() === userAddress.toLowerCase()) updateBalance();
   });
   
-  // Listen for account changes in MetaMask (e.g., user switches wallet)
   if (window.ethereum) {
-    window.ethereum.on('accountsChanged', (accounts) => {
-      window.location.reload(); // Simplest way to handle account switch is reload
-    });
-    window.ethereum.on('chainChanged', () => {
-      window.location.reload();
-    });
+    window.ethereum.on('accountsChanged', () => window.location.reload());
+    window.ethereum.on('chainChanged', () => window.location.reload());
   }
 }
 
@@ -131,14 +123,23 @@ async function createReferralCode() {
   } catch (err) { alert("Error: " + (err.reason || err.message)); }
 }
 
-// 6. Zap In 
+// 6. Zap In (MANDATORY CODE CHECK)
 async function zapIn() {
   const amount = document.getElementById("zapAmount").value;
   let code = document.getElementById("referrerCode").value;
+  
   if (!code) code = ""; 
   code = code.trim().toUpperCase();
 
-  if (!amount) return alert("Please enter an amount.");
+  // --- VALIDATION BLOCK ---
+  if (!amount || parseFloat(amount) <= 0) {
+    return alert("Please enter a valid amount.");
+  }
+
+  // STOP: Require Code
+  if (code.length === 0) {
+    return alert("⚠️ Referral Code is REQUIRED to Zap in.");
+  }
 
   try {
     const amountWei = ethers.utils.parseUnits(amount, 6); 
@@ -160,7 +161,13 @@ async function zapIn() {
     
   } catch (err) {
     console.error(err);
-    alert("Failed: " + (err.reason || err.message));
+    
+    // Parse Smart Contract Error Messages
+    let msg = err.reason || err.message;
+    if(msg.includes("Invalid Referral Code")) msg = "❌ That Referral Code does not exist!";
+    if(msg.includes("Cannot refer yourself")) msg = "❌ You cannot use your own code!";
+    
+    alert("Transaction Failed: " + msg);
     document.getElementById("connectBtn").innerText = userAddress.slice(0,6) + "...";
   }
 }
@@ -185,15 +192,10 @@ function copyToClipboard() {
   });
 }
 
-// --- 9. AUTO-CONNECT ON PAGE LOAD ---
+// 9. Auto-Connect
 window.addEventListener('load', async () => {
-  // Check if MetaMask is installed
   if (window.ethereum) {
-    // Check if we are already connected (silent check)
     const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-    if (accounts.length > 0) {
-      // If accounts exist, run the full connection logic silently
-      connectWallet(true);
-    }
+    if (accounts.length > 0) connectWallet(true);
   }
 });
