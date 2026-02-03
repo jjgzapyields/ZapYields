@@ -2,128 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>ZapApy V2 | Pro Aggregator</title>
-  <meta content="width=device-width, initial-scale=1" name="viewport">
-  <link href="css/normalize.css" rel="stylesheet" type="text/css">
-  <link href="css/components.css" rel="stylesheet" type="text/css">
-  <link href="css/shade-be5342c59f721d0abcf-07a16bef20d09.css" rel="stylesheet" type="text/css">
+  <title>ZapApy V2 Pro | Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-  <style>
-    body { background-color: #09090b; color: #e4e4e7; font-family: 'Inter', sans-serif; margin: 0; }
-    .zy-main-container { padding: 30px; max-width: 1200px; margin: 0 auto; }
-    .zy-subtext-highlight { color: #a1a1aa; margin-bottom: 40px; text-align: center; font-size: 16px; line-height: 1.6; }
-    .zy-header { background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #27272a; padding: 15px 0; width: 100%; }
-    .zy-inner { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding: 0 20px; flex-wrap: wrap; gap: 15px; }
-    .glass-card { background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 25px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
-    .hidden { display: none !important; }
-    .status-msg { font-size: 11px; margin-top: 15px; text-align: center; color: #10b981; font-weight: bold; }
-    .status-error { color: #ff6b6b !important; }
-    .pro-stat { font-size: 13px; color: #a1a1aa; margin-top: 8px; display: flex; justify-content: space-between; }
-    .stat-val { color: #fff; font-weight: 600; }
-    .per-second { color: #3b82f6; font-size: 11px; font-weight: bold; margin-top: 5px; text-align: right; }
-    .ref-count-badge { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid #10b981; padding: 4px 10px; border-radius: 20px; font-size: 11px; }
-    .apy-badge { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 800; }
-    .disabled-btn { opacity: 0.3 !important; pointer-events: none !important; background: #52525b !important; }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-    .zy-nav {display: flex;align-items: center;gap: 20px;}
-    /* Mobile Warning Modal Styling */
-    #warningModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
-
-    @media(max-width: 768px) {
-	.zy-inner {
-		justify-content: center;
-	}
-	.zy-nav {
-		flex-direction: row; flex-wrap: wrap; justify-content: center;
-	}
-   }
-  </style>
 </head>
-<body class="body-2">
-  <div id="warningModal">
-    <div class="glass-card" style="max-width: 400px; text-align: center; border: 1px solid #ef4444;">
-      <h3 style="color: #ef4444; margin-top: 0;">⚠️ Early Exit Warning</h3>
-      <p style="font-size: 14px; color: #e4e4e7;">Your 76-hour loyalty timer has not expired. Withdrawing now will trigger a <strong>1% Early Exit Penalty</strong>.</p>
-      <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button id="confirmZapOut" class="w-button" style="background: #ef4444; flex: 1; border-radius: 8px; padding: 10px; color: white; border: none; cursor: pointer;">Withdraw Anyway</button>
-        <button id="cancelZapOut" class="w-button" style="background: #27272a; flex: 1; border-radius: 8px; padding: 10px; color: white; border: none; cursor: pointer;">Keep Earning</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="zy-header">
+<body>
+  
+  <header class="zy-header">
     <div class="zy-inner">
-      <div class="zy-nav">
-        <div class="zy-logo">ZapApy⚡ <span style="font-size: 10px; color: #10b981;">V2 PRO</span></div>
-        <div id="networkStatus" style="display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.3);">
-          <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: pulse 2s infinite;"></div>
-          <span style="font-size: 11px; font-weight: 700; color: #10b981;">BASE MAINNET</span>
-        </div>
-        <nav style="display: flex; gap: 15px;">
-          <a href="index.html" style="color: #fff; text-decoration: none; font-size: 14px; font-weight: 600;">App</a>
-          <a href="docs.html" style="color: #a1a1aa; text-decoration: none; font-size: 14px;">Docs</a>
-        </nav>
+      <div class="logo">ZapApy⚡ <span style="color:#10b981; font-size:10px;">V2 PRO</span></div>
+      <nav>
+        <a href="index.html" class="active">App</a>
+        <a href="docs.html">Docs</a>
+        <button id="connectBtn" class="connect-btn" onclick="connectWallet()">Connect Wallet</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrapper">
+    <div class="stats-grid">
+      <div class="glass-card">
+        <span class="label">Your Balance</span>
+        <div class="value" id="userBalance">---</div>
       </div>
-      <div class="header-btns">
-        <a href="#" id="connectBtn" class="zy-connect-wallet w-button">Connect Wallet</a>
-        <a href="#" id="disconnectBtn" class="w-button hidden" style="background: #450a0a;">Disconnect</a>
+      <div class="glass-card">
+        <span class="label">Current Tier</span>
+        <div class="value" style="color: #3b82f6;" id="userTier">Spark ⚡</div>
+        <div class="sub-value">10% Commission</div>
       </div>
+      <div class="glass-card">
+        <span class="label">Your Referral ID</span>
+        <div class="value" style="color: #10b981;" id="myRefId">---</div>
+        <div class="sub-value" id="idStatus">Connect to check</div>
+      </div>
+    </div>
+
+    <div class="glass-card main-action">
+      <h2>⚡ Zap Liquidity</h2>
+      
+      <div id="generateSection" class="alert-box" style="display:none; text-align:center;">
+        <p>You don't have a Referral ID yet.</p>
+        <button onclick="createReferralId()" class="secondary-btn">Generate My ID</button>
+      </div>
+
+      <div class="input-group">
+        <label>Amount (USDC)</label>
+        <input type="number" id="zapAmount" placeholder="0.00">
+      </div>
+
+      <div class="input-group">
+        <label>Referrer ID (Required)</label>
+        <input type="number" id="referrerId" placeholder="e.g. 1005">
+      </div>
+
+      <div class="safety-badge">
+        🔒 <strong>Anti-Drain Protection:</strong> We only approve the exact amount you enter.
+      </div>
+
+      <button onclick="zapIn()" class="primary-btn">Approve & Zap In</button>
     </div>
   </div>
 
-  <div class="zy-main-container">
-    <h1 class="zy-h1" style="text-align: center;">Earn While You Sleep. <br/>Multiply Income When You Share.</h1>
-    <p class="zy-subtext-highlight">Get auto-compounding Base yields and unlock up to 80% commission on your network's profit.</p>
-    
-    <div class="zy-2-cols" style="display: flex; gap: 20px; flex-wrap: wrap;">
-      <div class="zy-col1 glass-card" style="flex: 1; min-width: 300px;">
-        <h2 class="heading-9">Deposit USDC</h2>
-        <input placeholder="Min 10.00 USDC" type="number" id="amountInput" class="input-field" style="color: white; background: #09090b; border: 1px solid #3f3f46; width: 100%; padding: 12px; border-radius: 8px; box-sizing: border-box;">
-        <div style="margin-top: 20px; display: flex; flex-direction: row; gap: 10px; flex-wrap: wrap">
-          <a href="#" id="approveBtn" class="button-3 w-button">1. Approve</a>
-          <a href="#" id="zapInBtn" class="zy-approve w-button disabled-btn">2. Zap In</a>
-          <a href="#" id="zapOutBtn" class="red-btn w-button disabled-btn" style="background: #7f1d1d;">Zap Out & Claim</a>
-        </div>
-        <p id="statusLabel" class="status-msg">Connect Wallet to Start</p>
-      </div>
-
-      <div class="zy-col1 glass-card" style="flex: 1; min-width: 300px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #27272a; padding-bottom: 10px;">
-          <h2 class="heading-9" style="margin: 0; border: none;">Live Portfolio</h2>
-          <div class="apy-badge"><span id="apyDisplay">9.10</span>% APY</div>
-        </div>
-        <div class="yb-amt-wrap">
-          <div class="zy-yb-cur">$</div>
-          <div class="zy-yb-amt" id="yieldDisplay">0.00</div>
-        </div>
-        
-        <div style="margin-top: 15px; text-align: left;">
-          <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px; color: #a1a1aa;">
-            <span id="nextTierLabel">Next Tier: Spark</span>
-            <span id="tierPercent">0%</span>
-          </div>
-          <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
-            <div id="tierProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); transition: width 1s ease;"></div>
-          </div>
-        </div>
-
-        <div class="pro-stat" style="margin-top: 15px;"><span>Principal:</span> <span class="stat-val">$<span id="principalDisplay">0.00</span></span></div>
-        <div class="per-second">+$<span id="perSecondDisplay">0.000000</span> / sec</div>
-        
-        <div style="margin-top: 25px; border-top: 1px solid #27272a; padding-top: 20px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 14px;">Referral Earnings</span>
-            <div class="ref-count-badge">Recruits: <span id="refCountDisplay">0</span></div>
-          </div>
-          <div class="yb-amt-wrap" style="margin-top: 5px;">
-            <div class="zy-yb-cur" style="color:#facc15;">$</div>
-            <div class="zy-yb-amt" id="refEarningsDisplay" style="color:#facc15;">0.00</div>
-          </div>
-          <a href="#" id="copyRefBtn" class="ref-btn w-button" style="width: 100%; margin-top: 15px; box-sizing: border-box;">Copy Referral Link</a>
-        </div>
-      </div>
-    </div>
-  </div>
-  <script src="main.js"></script>
+  <script src="/main.js"></script>
 </body>
 </html>
