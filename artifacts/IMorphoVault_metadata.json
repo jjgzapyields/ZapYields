@@ -72,7 +72,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/zapyield-mainnet-beta0.1.7.sol": "IMorphoVault"
+			"contracts/zapyield-mainnet-beta0.1.8.sol": "IMorphoVault"
 		},
 		"evmVersion": "osaka",
 		"libraries": {},
@@ -214,12 +214,12 @@
 				"dweb:/ipfs/QmarDJ5hZEgBtCmmrVzEZWjub9769eD686jmzb2XpSU1cM"
 			]
 		},
-		"contracts/zapyield-mainnet-beta0.1.7.sol": {
-			"keccak256": "0x12a682086e23ea12b147596963da0397fb5e9be3c577296e4877ce7e96f85c1e",
+		"contracts/zapyield-mainnet-beta0.1.8.sol": {
+			"keccak256": "0x528edef7de5cef728a6397eba5f7a97d097e676a9a2bc9610859d680d0e01679",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://638e89df4f81093e847707a452ff702b6944a34bd7a33494dfe33ae33db79e9d",
-				"dweb:/ipfs/QmZ71zjWDyRNKs2H8xgKBgjCb2k3jKMBHiWcYLGjMwYGR6"
+				"bzz-raw://34ba12a88ec13ba2c13509f4feec4b22ec4701bc290df0eefb81df66bb2639e4",
+				"dweb:/ipfs/QmUNorFXVJtjpTT4y4JM5roTPt1yBf8eMvt6zt7kPpfiWk"
 			]
 		}
 	},
