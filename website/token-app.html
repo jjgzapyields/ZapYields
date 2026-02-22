@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZAPA | Don't Just Hold. Zap.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@300;700&display=swap');
+        body { font-family: 'Space Grotesk', sans-serif; background-color: #0f172a; color: white; }
+        .pixel-font { font-family: 'Press Start 2P', cursive; }
+        .neon-text { text-shadow: 0 0 10px #4ade80, 0 0 20px #4ade80; }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #4ade80; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-900 flex flex-col min-h-screen text-center">
+
+    <div class="fixed inset-0 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 z-0"></div>
+
+    <div class="relative z-10 flex-grow flex flex-col justify-center items-center py-20 px-4">
+        
+        <div class="w-full max-w-4xl mx-auto mb-16">
+            <h1 class="text-5xl md:text-8xl font-bold mb-6 text-green-400 animate__animated animate__pulse animate__infinite pixel-font neon-text">
+                ZAPA
+            </h1>
+            <p class="text-lg md:text-2xl mb-10 text-gray-300 leading-relaxed">
+                The first token that pays you to recruit. <br>
+                <span class="inline-block mt-2 text-green-400 font-bold bg-green-900/30 px-4 py-1 rounded-full border border-green-500/20">
+                    Earn 50% of the Reflection Fee
+                </span>
+            </p>
+
+            <a href="app.html" class="inline-block bg-green-500 hover:bg-green-400 text-black font-bold py-4 px-12 rounded-full text-xl transition transform hover:scale-105 shadow-[0_0_20px_rgba(74,222,128,0.5)] border-b-4 border-green-700 active:border-b-0 active:translate-y-1">
+                LAUNCH APP 🚀
+            </a>
+        </div>
+
+        <div class="w-full max-w-6xl mx-auto">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 pixel-font text-white/80">ZAPANOMICS</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
+                <div class="w-full p-6 border border-green-500/30 rounded-xl bg-gray-800/80 backdrop-blur-sm hover:border-green-400 transition hover:-translate-y-2 duration-300 flex flex-col items-center">
+                    <div class="text-4xl mb-3">🔥</div>
+                    <h3 class="text-xl font-bold mb-2 text-red-400">1% Burn</h3>
+                    <p class="text-sm text-gray-400">Supply shrinks on every single trade.</p>
+                </div>
+                
+                <div class="w-full p-6 border border-green-500/30 rounded-xl bg-gray-800/80 backdrop-blur-sm hover:border-green-400 transition hover:-translate-y-2 duration-300 flex flex-col items-center">
+                    <div class="text-4xl mb-3">📢</div>
+                    <h3 class="text-xl font-bold mb-2 text-blue-400">1% Marketing</h3>
+                    <p class="text-sm text-gray-400">Fueling the viral hype machine.</p>
+                </div>
+                
+                <div class="w-full p-6 border border-green-500/30 rounded-xl bg-gray-800/80 backdrop-blur-sm hover:border-green-400 transition hover:-translate-y-2 duration-300 flex flex-col items-center">
+                    <div class="text-4xl mb-3">👨‍💻</div>
+                    <h3 class="text-xl font-bold mb-2 text-purple-400">1% Team</h3>
+                    <p class="text-sm text-gray-400">Devs & Operations budget.</p>
+                </div>
+                
+                <div class="w-full p-6 border-2 border-green-500 rounded-xl bg-green-900/30 backdrop-blur-sm shadow-[0_0_15px_rgba(74,222,128,0.2)] hover:shadow-[0_0_25px_rgba(74,222,128,0.6)] transition hover:-translate-y-2 duration-300 flex flex-col items-center">
+                    <div class="text-4xl mb-3">🤝</div>
+                    <h3 class="text-xl font-bold mb-2 text-green-400">2% Reflection</h3>
+                    <p class="text-sm text-gray-200">
+                        Refer a friend? <br>
+                        <span class="font-bold text-green-300">YOU get 1% directly.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="relative z-10 bg-gray-900 border-t border-gray-800 py-10 mt-auto">
+        <div class="container mx-auto px-4 flex flex-col items-center justify-center gap-6">
+            
+            <div class="flex gap-8 mb-2">
+                <a href="https://twitter.com/YOUR_ACCOUNT" target="_blank" class="text-gray-400 hover:text-green-400 transition transform hover:scale-125">
+                    <i class="fab fa-twitter text-3xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-blue-500 transition transform hover:scale-125">
+                    <i class="fab fa-telegram text-3xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition transform hover:scale-125">
+                    <i class="fas fa-book text-3xl"></i>
+                </a>
+            </div>
+
+            <div class="text-gray-600 text-sm font-mono">
+                &copy; 2024 ZAPA Token. All rights reserved.
+            </div>
+
+        </div>
+    </footer>
+
+</body>
+</html>

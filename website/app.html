@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZAPA Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript"></script>
+    <script src="abi.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&display=swap');
+        body { font-family: 'Space Grotesk', sans-serif; background-color: #0f172a; color: #e2e8f0; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(74, 222, 128, 0.1); }
+        .pixel-font { font-family: monospace; }
+        
+        .spinner { border: 4px solid rgba(255, 255, 255, 0.1); width: 24px; height: 24px; border-radius: 50%; border-left-color: #4ade80; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-left: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <nav class="p-4 border-b border-gray-700 flex justify-between items-center bg-gray-900/80 sticky top-0 backdrop-blur z-50">
+        <div class="text-3xl font-bold text-green-400 tracking-tighter">ZAPA</div>
+        <button id="connectBtn" onclick="connectWallet()" class="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded-full font-bold transition shadow-[0_0_15px_rgba(74,222,128,0.4)]">
+            Connect Wallet
+        </button>
+    </nav>
+
+    <div class="container mx-auto p-4 md:p-10 space-y-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <div class="glass p-8 rounded-2xl relative overflow-hidden min-h-[300px] flex flex-col justify-center">
+                <div class="absolute top-0 right-0 p-4 opacity-10 text-9xl">🆔</div>
+                <h2 class="text-2xl font-bold text-white mb-2">My Referral Code</h2>
+                <p class="text-gray-400 text-sm mb-6">Share this code to earn 1% from every trade your downlines make.</p>
+                
+                <div id="createCodeSection" class="hidden">
+                    <p class="mb-4 text-yellow-300 text-sm">You don't have a code yet!</p>
+                    <button onclick="generateAndRegister()" id="genBtn" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-4 rounded-xl transition transform hover:scale-[1.02]">
+                        GENERATE & REGISTER CODE 🎲
+                    </button>
+                </div>
+
+                <div id="displayCodeSection" class="hidden text-center">
+                    <div class="bg-black/50 p-6 rounded-xl border border-green-500/30 mb-4 cursor-pointer hover:bg-black/70 transition" onclick="copyCode()">
+                        <span id="myCodeDisplay" class="text-4xl font-mono text-green-400 tracking-widest font-bold">LOADING</span>
+                    </div>
+                    <button onclick="copyCode()" class="text-sm text-gray-400 hover:text-white underline">Click to Copy</button>
+                </div>
+                
+                <p id="genCodeStatus" class="mt-4 text-center text-sm text-blue-300 h-6"></p>
+            </div>
+
+            <div class="glass p-8 rounded-2xl min-h-[300px] flex flex-col justify-center">
+                <h2 class="text-2xl font-bold text-white mb-2">Bind a Referrer</h2>
+                <p class="text-gray-400 text-sm mb-6">Enter a 7-digit code to permanently increase your reflections.</p>
+                
+                <div class="flex flex-col gap-4">
+                    <input type="text" id="refInput" maxlength="7" placeholder="e.g. ZAP77X9" class="bg-gray-800 border border-gray-600 p-4 rounded-xl text-white text-center text-xl tracking-widest focus:outline-none focus:border-green-500 uppercase transition">
+                    <button onclick="bindReferrer()" class="w-full bg-gray-700 hover:bg-green-600 text-white font-bold py-4 rounded-xl transition" id="bindBtn">
+                        ACTIVATE CODE
+                    </button>
+                </div>
+                <p id="bindStatus" class="mt-4 text-center text-sm text-yellow-400 h-6"></p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass p-6 rounded-xl text-center">
+                <h3 class="text-gray-400 text-sm uppercase tracking-wider">Total Recruits</h3>
+                <div class="text-5xl font-bold text-white mt-2" id="downlineCount">0</div>
+            </div>
+            
+            <div class="glass p-6 rounded-xl text-center border-green-500/30 border">
+                <h3 class="text-green-400 text-sm uppercase tracking-wider">Total Earnings</h3>
+                <div class="text-4xl font-bold text-white mt-2 truncate"><span id="totalEarned">0.00</span> ZAPA</div>
+            </div>
+
+            <div class="glass p-6 rounded-xl text-center">
+                <h3 class="text-gray-400 text-sm uppercase tracking-wider">Top Downline</h3>
+                <div class="text-xl font-mono text-blue-300 mt-4" id="topDownline">None</div>
+            </div>
+        </div>
+
+        <div class="glass p-6 rounded-xl">
+            <h3 class="text-xl text-white mb-4 flex items-center gap-2">
+                <span class="animate-pulse text-green-500">●</span> Live Earnings Feed
+            </h3>
+            <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                <table class="w-full text-left text-sm text-gray-400">
+                    <thead class="bg-gray-800 text-gray-200 sticky top-0">
+                        <tr>
+                            <th class="p-3">Referrer Code</th>
+                            <th class="p-3">Trader</th>
+                            <th class="p-3 text-right">ZAPA Earned</th>
+                        </tr>
+                    </thead>
+                    <tbody id="globalFeed" class="divide-y divide-gray-700"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let provider, signer, contract;
+        let userAddress;
+
+        // 1. AUTO-CONNECT ON LOAD
+        window.addEventListener('load', async () => {
+            if (window.ethereum) {
+                // Listen for account changes (swapping wallets in MetaMask)
+                window.ethereum.on('accountsChanged', handleAccountsChanged);
+                window.ethereum.on('chainChanged', () => window.location.reload());
+
+                // Silent Check: Are we already connected?
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                if (accounts.length > 0) {
+                    initApp(accounts[0]);
+                }
+            }
+        });
+
+        // 2. Manual Connect Button
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                    initApp(accounts[0]);
+                } catch(e) {
+                    console.error("Connection Error:", e);
+                }
+            } else {
+                alert("Please install MetaMask!");
+            }
+        }
+
+        // 3. Handle Account Switch
+        function handleAccountsChanged(accounts) {
+            if (accounts.length === 0) {
+                // User disconnected
+                window.location.reload();
+            } else {
+                // User switched account
+                initApp(accounts[0]);
+            }
+        }
+
+        // 4. Initialize App
+        async function initApp(address) {
+            userAddress = address;
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            signer = provider.getSigner();
+            contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+            // Update UI
+            const btn = document.getElementById('connectBtn');
+            btn.innerText = userAddress.substring(0,6) + "...";
+            btn.classList.add("bg-gray-700");
+            btn.onclick = null; // Disable button click
+
+            // Load Data
+            checkUserCode();
+            loadDashboardData();
+        }
+
+        // 5. Check User Code
+        async function checkUserCode() {
+            try {
+                const code = await contract.walletToCode(userAddress);
+                if(code && code.length > 0) {
+                    document.getElementById('createCodeSection').classList.add('hidden');
+                    document.getElementById('displayCodeSection').classList.remove('hidden');
+                    document.getElementById('myCodeDisplay').innerText = code;
+                } else {
+                    document.getElementById('createCodeSection').classList.remove('hidden');
+                    document.getElementById('displayCodeSection').classList.add('hidden');
+                }
+            } catch(err) {
+                console.log("Error fetching code", err);
+            }
+        }
+
+        // 6. Generate Code
+        async function generateAndRegister() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let randomCode = '';
+            for (let i = 0; i < 7; i++) {
+                randomCode += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            if(!confirm(`Register code: ${randomCode}? This cannot be changed.`)) return;
+
+            const btn = document.getElementById('genBtn');
+            const status = document.getElementById('genCodeStatus');
+
+            try {
+                btn.disabled = true;
+                btn.innerText = "Registering...";
+                status.innerHTML = "Request sent... <span class='spinner'></span>";
+                
+                const tx = await contract.createCode(randomCode);
+                status.innerHTML = "Waiting confirmation... <span class='spinner'></span>";
+                await tx.wait();
+                
+                status.innerText = "Success! Refreshing...";
+                setTimeout(() => {
+                    checkUserCode();
+                    loadDashboardData();
+                    status.innerText = "";
+                }, 5000);
+
+            } catch (err) {
+                console.error(err);
+                status.innerText = "Error: " + (err.reason || err.message);
+                btn.disabled = false;
+                btn.innerText = "GENERATE & REGISTER CODE 🎲";
+            }
+        }
+
+        // 7. Bind Referrer
+        async function bindReferrer() {
+            const codeInput = document.getElementById('refInput').value.toUpperCase().trim();
+            const btn = document.getElementById('bindBtn');
+            const status = document.getElementById('bindStatus');
+
+            if(codeInput.length !== 7) {
+                alert("Code must be 7 chars");
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                status.innerHTML = "Request sent... <span class='spinner'></span>";
+                
+                const tx = await contract.addReferrer(codeInput);
+                status.innerHTML = "Waiting confirmation... <span class='spinner'></span>";
+                await tx.wait();
+                
+                status.innerText = "Bound! Refreshing...";
+                btn.innerText = "BOUND";
+                setTimeout(() => {
+                    loadDashboardData();
+                    status.innerText = "";
+                }, 5000);
+
+            } catch (err) {
+                console.error(err);
+                status.innerText = "Error: " + (err.reason || err.message);
+                btn.disabled = false;
+                btn.innerText = "ACTIVATE CODE";
+            }
+        }
+
+        // 8. Load Dashboard
+        async function loadDashboardData() {
+            if(!contract) return;
+            try {
+                const rewardFilter = contract.filters.ReferralRewardPaid(userAddress, null);
+                const rewardEvents = await contract.queryFilter(rewardFilter);
+                
+                let totalZapa = ethers.BigNumber.from(0);
+                let downlines = new Set();
+                let earningsMap = {}; 
+
+                rewardEvents.forEach(evt => {
+                    const trader = evt.args.user;
+                    const amount = evt.args.amount;
+                    totalZapa = totalZapa.add(amount);
+                    downlines.add(trader);
+
+                    if(!earningsMap[trader]) earningsMap[trader] = ethers.BigNumber.from(0);
+                    earningsMap[trader] = earningsMap[trader].add(amount);
+                });
+
+                document.getElementById('downlineCount').innerText = downlines.size;
+                document.getElementById('totalEarned').innerText = parseFloat(ethers.utils.formatUnits(totalZapa, 18)).toFixed(2);
+
+                let topUser = "None";
+                let maxAmt = ethers.BigNumber.from(0);
+                for (const [user, amt] of Object.entries(earningsMap)) {
+                    if(amt.gt(maxAmt)) {
+                        maxAmt = amt;
+                        topUser = user.substring(0,6) + "...";
+                    }
+                }
+                document.getElementById('topDownline').innerText = topUser;
+                loadGlobalFeed();
+            } catch(e) { console.log("Data error", e); }
+        }
+
+        async function loadGlobalFeed() {
+            try {
+                const currentBlock = await provider.getBlockNumber();
+                const filter = contract.filters.ReferralRewardPaid();
+                const events = await contract.queryFilter(filter, currentBlock - 5000, currentBlock);
+                
+                const feedBody = document.getElementById('globalFeed');
+                feedBody.innerHTML = "";
+                const recentEvents = events.slice(-10).reverse();
+
+                for(let evt of recentEvents) {
+                    let refCode = "LOADING...";
+                    try { refCode = await contract.walletToCode(evt.args.referrer); } 
+                    catch(e) { refCode = "UNKNOWN"; }
+
+                    feedBody.innerHTML += `
+                        <tr class="hover:bg-gray-700/50 transition">
+                            <td class="p-3 font-mono text-yellow-400 font-bold tracking-wider">${refCode}</td>
+                            <td class="p-3 text-blue-300 text-xs">${evt.args.user.substring(0,6)}...</td>
+                            <td class="p-3 font-mono text-right text-green-400">+${parseFloat(ethers.utils.formatUnits(evt.args.amount, 18)).toFixed(2)}</td>
+                        </tr>`;
+                }
+            } catch(e) { console.log("Feed error", e); }
+        }
+
+        function copyCode() {
+            const code = document.getElementById('myCodeDisplay').innerText;
+            navigator.clipboard.writeText(code);
+            alert("Code copied!");
+        }
+        
+        setInterval(() => { if(userAddress) loadDashboardData(); }, 30000);
+    </script>
+</body>
+</html>
