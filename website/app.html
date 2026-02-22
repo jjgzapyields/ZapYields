@@ -6,7 +6,9 @@
     <title>ZAPA Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript"></script>
-    <script src="abi.js"></script>
+    
+    <script src="abi.js"></script> 
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&display=swap');
         body { font-family: 'Space Grotesk', sans-serif; background-color: #0f172a; color: #e2e8f0; }
@@ -27,7 +29,8 @@
     </nav>
 
     <div class="container mx-auto p-4 md:p-10 space-y-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             <div class="glass p-8 rounded-2xl relative overflow-hidden min-h-[300px] flex flex-col justify-center">
                 <div class="absolute top-0 right-0 p-4 opacity-10 text-9xl">🆔</div>
@@ -63,6 +66,20 @@
                 </div>
                 <p id="bindStatus" class="mt-4 text-center text-sm text-yellow-400 h-6"></p>
             </div>
+
+            <div class="glass p-8 rounded-2xl min-h-[300px] flex flex-col justify-center border-t-4 border-blue-500">
+                <h2 class="text-2xl font-bold text-white mb-2">Deposit Liquidity</h2>
+                <p class="text-gray-400 text-sm mb-6">Deposit USDC to start earning yield.</p>
+                
+                <div class="flex flex-col gap-4">
+                    <input type="text" id="depositAmount" placeholder="0.00" class="bg-gray-800 border border-gray-600 p-4 rounded-xl text-white text-center text-xl focus:outline-none focus:border-blue-500 transition">
+                    <button onclick="depositUSDC()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition shadow-[0_0_15px_rgba(59,130,246,0.4)]" id="depositBtn">
+                        APPROVE & DEPOSIT
+                    </button>
+                </div>
+                <p id="depositStatus" class="mt-4 text-center text-sm text-blue-300 h-6"></p>
+            </div>
+            
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -102,17 +119,22 @@
     </div>
 
     <script>
-        let provider, signer, contract;
+        let provider, signer, contract, usdcContract;
         let userAddress;
+
+        // Base Network USDC Address
+        const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+        const USDC_ABI = [
+            "function approve(address spender, uint256 amount) external returns (bool)",
+            "function allowance(address owner, address spender) external view returns (uint256)"
+        ];
 
         // 1. AUTO-CONNECT ON LOAD
         window.addEventListener('load', async () => {
             if (window.ethereum) {
-                // Listen for account changes (swapping wallets in MetaMask)
                 window.ethereum.on('accountsChanged', handleAccountsChanged);
                 window.ethereum.on('chainChanged', () => window.location.reload());
 
-                // Silent Check: Are we already connected?
                 const accounts = await window.ethereum.request({ method: 'eth_accounts' });
                 if (accounts.length > 0) {
                     initApp(accounts[0]);
@@ -137,10 +159,8 @@
         // 3. Handle Account Switch
         function handleAccountsChanged(accounts) {
             if (accounts.length === 0) {
-                // User disconnected
                 window.location.reload();
             } else {
-                // User switched account
                 initApp(accounts[0]);
             }
         }
@@ -150,13 +170,16 @@
             userAddress = address;
             provider = new ethers.providers.Web3Provider(window.ethereum);
             signer = provider.getSigner();
+            
+            // NOTE: Make sure contractAddress and contractABI are defined in your abi.js
             contract = new ethers.Contract(contractAddress, contractABI, signer);
+            usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, signer);
 
             // Update UI
             const btn = document.getElementById('connectBtn');
             btn.innerText = userAddress.substring(0,6) + "...";
             btn.classList.add("bg-gray-700");
-            btn.onclick = null; // Disable button click
+            btn.onclick = null; 
 
             // Load Data
             checkUserCode();
@@ -224,7 +247,7 @@
             const status = document.getElementById('bindStatus');
 
             if(codeInput.length !== 7) {
-                alert("Code must be 7 chars");
+                alert("Code must be exactly 7 characters");
                 return;
             }
 
@@ -251,7 +274,68 @@
             }
         }
 
-        // 8. Load Dashboard
+        // 8. DEPOSIT USDC LOGIC (Fixed for BigNumber Errors)
+        async function depositUSDC() {
+            const rawAmount = document.getElementById('depositAmount').value.trim();
+            const btn = document.getElementById('depositBtn');
+            const status = document.getElementById('depositStatus');
+
+            if(!rawAmount || isNaN(rawAmount) || parseFloat(rawAmount) <= 0) {
+                alert("Please enter a valid amount greater than 0.");
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                
+                // FORCE standard number format and cut off beyond 6 decimals
+                // This prevents "invalid BigNumber string" and scientific notation errors
+                const safeAmount = parseFloat(rawAmount).toFixed(6);
+                
+                // Safely convert to Wei (USDC uses 6 decimals)
+                const amountWei = ethers.utils.parseUnits(safeAmount, 6); 
+                
+                // Check Allowance
+                status.innerHTML = "Checking allowance... <span class='spinner'></span>";
+                const allowance = await usdcContract.allowance(userAddress, contractAddress);
+
+                // If allowance is less than deposit amount, prompt approval
+                if (allowance.lt(amountWei)) {
+                    status.innerHTML = "Approving USDC... <span class='spinner'></span>";
+                    btn.innerText = "APPROVING...";
+                    const txApprove = await usdcContract.approve(contractAddress, amountWei);
+                    await txApprove.wait();
+                }
+
+                // Execute Deposit 
+                status.innerHTML = "Depositing... <span class='spinner'></span>";
+                btn.innerText = "DEPOSITING...";
+                
+                // ⚠️ NOTE: Change 'deposit' to match your actual Smart Contract deposit function (e.g. zapIn, addLiquidity)
+                const txDeposit = await contract.deposit(amountWei); 
+                await txDeposit.wait();
+
+                status.innerText = "Deposit Successful! 🎉";
+                btn.innerText = "APPROVE & DEPOSIT";
+                document.getElementById('depositAmount').value = ""; // Clear input field
+                
+                setTimeout(() => status.innerText = "", 5000);
+
+            } catch (err) {
+                console.error(err);
+                
+                // Clean up the error message for the user
+                let errMsg = err.reason || err.message;
+                if (errMsg.includes("BigNumber")) errMsg = "Invalid number format.";
+                if (errMsg.includes("user rejected")) errMsg = "Transaction rejected by user.";
+                
+                status.innerText = "Error: " + errMsg;
+                btn.disabled = false;
+                btn.innerText = "APPROVE & DEPOSIT";
+            }
+        }
+
+        // 9. Load Dashboard
         async function loadDashboardData() {
             if(!contract) return;
             try {
@@ -288,6 +372,7 @@
             } catch(e) { console.log("Data error", e); }
         }
 
+        // 10. Load Global Feed
         async function loadGlobalFeed() {
             try {
                 const currentBlock = await provider.getBlockNumber();
